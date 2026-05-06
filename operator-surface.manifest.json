@@ -1,48 +1,66 @@
 {
   "version": 1,
-  "sourceOfTruth": "docs/UNIFIED_OPERATOR_APP.md",
-  "bridgeMode": "local-first",
-  "capabilityGroups": [
+  "surfaceIds": [
     {
-      "id": "prompt-intake",
-      "name": "Prompt intake and plan shaping",
-      "owner": "shared",
-      "description": "Capture the request once and preserve structured planning context across apps."
-    },
-    {
-      "id": "council-review",
-      "name": "Council review and verification",
-      "owner": "web",
-      "description": "Run bounded review and keep approval visible before action."
-    },
-    {
-      "id": "template-model-selection",
-      "name": "Template and model selection",
-      "owner": "web",
-      "description": "Expose donor template catalogs, model hubs, and route-shaping choices before generation."
-    },
-    {
-      "id": "workspace-handoff",
-      "name": "Workspace lifecycle, artifacts, and handoff",
-      "owner": "shared",
-      "description": "Expose the same workspace, sync, sandbox, and generated-output story across browser and workstation surfaces."
-    },
-    {
-      "id": "repo-docs",
-      "name": "Repo visibility, files, and docs",
+      "id": "bmo-operator",
+      "name": "BMO Operator surface",
       "owner": "local",
-      "description": "Keep repo state, docs shortcuts, and file editing anchored to the workstation."
-    },
+      "description": "The primary control surface for the BMO operator stack."
+    }
+  ],
+  "components": [
     {
-      "id": "validation-runtime",
-      "name": "Validation and runtime recovery",
+      "id": "bmo-core",
+      "name": "BMO Core",
       "owner": "local",
-      "description": "Make guarded execution and runtime checks explicit and operator-visible."
+      "description": "The fundamental logic and orchestration engine for BMO."
     },
     {
-      "id": "companion-resilience",
-      "name": "Companion UX and resilience cues",
-      "owner": "shared",
+      "id": "bmo-context",
+      "name": "BMO Context",
+      "owner": "local",
+      "description": "Context-aware operating system for the BMO operator stack."
+    },
+    {
+      "id": "bmo-identity",
+      "name": "BMO Identity",
+      "owner": "local",
+      "description": "Identity and posture management for the BMO operator stack."
+    },
+    {
+      "id": "bmo-surface",
+      "name": "BMO Surface",
+      "owner": "local",
+      "description": "User-facing interface for interacting with the BMO operator stack."
+    },
+    {
+      "id": "bmo-runtime",
+      "name": "BMO Runtime",
+      "owner": "local",
+      "description": "Runtime environment for the BMO operator stack."
+    },
+    {
+      "id": "bmo-policy",
+      "name": "BMO Policy",
+      "owner": "local",
+      "description": "BMO's authoritative policy engine for agentic behavior."
+    },
+    {
+      "id": "bmo-state",
+      "name": "BMO State",
+      "owner": "local",
+      "description": "Durable state and memory management for the BMO operator stack."
+    },
+    {
+      "id": "bmo-receipts",
+      "name": "BMO Receipts",
+      "owner": "local",
+      "description": "Proof-of-work and receipt generation for the BMO operator stack."
+    },
+    {
+      "id": "bmo-context-aware-cues",
+      "name": "BMO Context-aware cues",
+      "owner": "local",
       "description": "Carry companion modes, Kairos world-state, and graceful degraded-state cues across the public and local surfaces."
     },
     {
@@ -50,64 +68,58 @@
       "name": "AgentCraft local observability",
       "owner": "local",
       "description": "Mirror approved BMO runtime lifecycle cues into a local HUD without changing runtime authority."
+    },
+    {
+      "id": "buddy-symphony",
+      "name": "Buddy Symphony orchestration",
+      "owner": "local",
+      "description": "Turn eligible work into isolated Buddy missions while BMO keeps policy, receipts, and state authority."
     }
   ],
   "documentShortcuts": [
     {
-      "id": "unified-operator",
-      "name": "Unified Operator Contract",
-      "path": "docs/UNIFIED_OPERATOR_APP.md",
-      "description": "Shared capability map and trust boundaries."
+      "id": "bmo-runbook",
+      "name": "BMO Runbook",
+      "path": "context/RUNBOOK.md",
+      "description": "The authoritative operational runbook for BMO."
     },
     {
-      "id": "enterprise-factory-bridge",
-      "name": "Enterprise Factory Bridge",
-      "path": "docs/ENTERPRISE_APP_FACTORY_BRIDGE.md",
-      "description": "How browser planning surfaces hand off to the local workstation."
-    },
-    {
-      "id": "private-app-repo-integration",
-      "name": "Private App Repo Integration",
-      "path": "docs/PRIVATE_APP_REPO_INTEGRATION.md",
-      "description": "How prismtek.dev_mega-app and BMO-app map into Builder Studio, Prism Agent, and BMO."
+      "id": "bmo-identity-guide",
+      "name": "BMO Identity Guide",
+      "path": "context/identity/IDENTITY.md",
+      "description": "How BMO maps into Builder Studio, Prism Agent, and BMO."
     },
     {
       "id": "agentcraft-integration",
       "name": "AgentCraft Integration",
       "path": "docs/AGENTCRAFT_INTEGRATION.md",
       "description": "Local-only AgentCraft HUD bridge, event mapping, and safety defaults."
+    },
+    {
+      "id": "buddy-symphony-guide",
+      "name": "Buddy Symphony Integration",
+      "path": "docs/BUDDY_SYMPHONY.md",
+      "description": "How Symphony-style work orchestration maps into Buddy missions, proofs, receipts, and Mission Control."
+    },
+    {
+      "id": "buddy-symphony-contract",
+      "name": "Buddy Symphony Contract",
+      "path": "contracts/buddy_symphony.md",
+      "description": "Contract boundaries and event mapping for Buddy-safe Symphony runs."
     }
   ],
   "validationActions": [
     {
-      "id": "validate-operating-system",
-      "name": "Validate operating system",
-      "command": "node scripts/validate-bmo-operating-system.mjs",
-      "description": "Verify startup, donor, and checkpoint files."
-    },
-    {
-      "id": "validate-routines",
-      "name": "Validate routines pack",
-      "command": "node scripts/bmo-routines.mjs validate",
-      "description": "Check the routine registry before runtime work."
-    },
-    {
-      "id": "worker-status",
-      "name": "Worker status",
-      "command": "bash ./scripts/bmo-worker-status",
-      "description": "Check gateway, worker, and checkpoint health."
-    },
-    {
-      "id": "runtime-doctor",
-      "name": "Runtime doctor",
-      "command": "make runtime-doctor",
+      "id": "bmo-doctor",
+      "name": "BMO doctor",
+      "command": "make bmo-doctor",
       "description": "Validate runtime profile and launch assumptions."
     },
     {
       "id": "agentcraft-doctor",
       "name": "AgentCraft doctor",
       "command": "make agentcraft-doctor",
-      "description": "Validate the optional local AgentCraft HUD integration."
+      "description": "Lidate the optional local AgentCraft HUD integration."
     },
     {
       "id": "agentcraft-health",
@@ -120,6 +132,12 @@
       "name": "AgentCraft smoke events",
       "command": "make agentcraft-smoke",
       "description": "Emit redacted smoke events through the optional AgentCraft reporter."
+    },
+    {
+      "id": "buddy-symphony-workflow-print",
+      "name": "Preview Buddy Symphony workflow",
+      "command": "node scripts/generate-buddy-symphony-workflow.mjs --print",
+      "description": "Render a Buddy-safe Symphony WORKFLOW template without writing files."
     }
   ]
 }
