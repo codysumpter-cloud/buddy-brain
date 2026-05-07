@@ -1,8 +1,49 @@
 # Task State
 
-Last updated: 2026-04-10 10:25 UTC
+Last updated: 2026-05-07 21:15 UTC
 
 ## Current status
+
+- Description: Repair Hostinger Sovereign Cloud runtime for AutoMindLab/BMO and Cloud Buddy Telegram Hermes gateway without DNS changes.
+- Active host: Hostinger VPS `187.77.223.224`.
+- Active repo on VPS: `/opt/bmo-gateway` (`Automind-Lab/automindlab-stack`).
+- Last successful step: AutoMindLab services, Nginx, Docker, Ollama, and Hermes gateway verified active; Hermes provider config switched away from failing cloud APIs to local `gemma4:e2b` through Ollama.
+- Verification complete: partial.
+- Manual steps remaining:
+  - Cody should reply directly to `@BeMoreBuddy_bot` to verify true inbound Telegram gateway response through Hermes.
+  - DNS must not be changed unless Cody explicitly authorizes a separate DNS task.
+- Safe to resume: true.
+
+## Current receipts
+
+- VPS direct health:
+  - `http://187.77.223.224/healthz` -> `automindlab gateway ok`
+  - `http://187.77.223.224/api/health` -> enterprise app factory ok
+  - `http://187.77.223.224/diagnostic/api/health` -> diagnostic service ok
+- Active VPS services:
+  - `docker`
+  - `nginx`
+  - `automind-diagnostic.service`
+  - `automind-app-factory.service`
+  - `ollama.service`
+  - user service `hermes-gateway.service`
+- Hermes model/provider repair:
+  - previous failures: Gemini 429 quota, OpenRouter 401 user not found, OpenAI 401 unauthorized
+  - local model: `gemma4:e2b` via Ollama at `http://127.0.0.1:11434/v1/`
+  - Hermes config: `model.default: gemma4:e2b`, `provider: custom`, `max_tokens: 2048`, `context_length: 64000`
+  - direct Hermes CLI from `/home/hermes` completed a local-model response with no API error
+  - post-restart gateway logs had no new 429/401/Gemini/OpenRouter errors
+- Telegram bot reachability:
+  - direct bot API send to Cody succeeded: `send_ok True`, `message_id 68`
+
+## DNS guardrail
+
+- Do not touch nameservers or DNS provider selection without explicit approval.
+- `prismtek.dev` remains on Cloudflare DNS.
+- `automindlab.tech` is intended to remain on Hostinger DNS per Cody's correction.
+- Treat DNS alignment as a separate controlled task, not a side-effect of app/runtime repair.
+
+## Previous current status
 
 - Description: Keep PR #229 merge-ready while tightening the MacBook OpenClaw/iOS boundary and host Telegram delivery policy.
 - Active repo: `/Users/prismtek/BeMore-stack`
