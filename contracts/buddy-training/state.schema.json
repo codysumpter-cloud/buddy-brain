@@ -40,6 +40,21 @@
     "achievements": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
     "cosmetics": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
     "evolution": { "type": "string", "enum": ["seedling", "apprentice", "specialist", "guardian"] },
-    "last_action": { "type": "string" }
+    "last_action": {
+      "type": "string",
+      "enum": [
+        "none",
+        "chat",
+        "remember",
+        "recall",
+        "skill_used",
+        "quest_completed",
+        "test_passed",
+        "doc_added",
+        "code_reviewed",
+        "memory_reviewed",
+        "approval_handled"
+      ]
+    }
   }
 }
