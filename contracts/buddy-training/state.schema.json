@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Buddy Training State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "buddy_id",
+    "level",
+    "xp",
+    "lifetime_xp",
+    "sparks",
+    "snacks",
+    "stats",
+    "achievements",
+    "cosmetics",
+    "evolution",
+    "last_action"
+  ],
+  "properties": {
+    "buddy_id": { "type": "string", "minLength": 1 },
+    "level": { "type": "integer", "minimum": 1 },
+    "xp": { "type": "integer", "minimum": 0 },
+    "lifetime_xp": { "type": "integer", "minimum": 0 },
+    "sparks": { "type": "integer", "minimum": 0 },
+    "snacks": { "type": "integer", "minimum": 0 },
+    "stats": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bond", "focus", "curiosity", "discipline", "creativity", "reliability", "autonomy"],
+      "properties": {
+        "bond": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "focus": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "curiosity": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "discipline": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "creativity": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "reliability": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "autonomy": { "type": "integer", "minimum": 0, "maximum": 100 }
+      }
+    },
+    "achievements": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "cosmetics": { "type": "array", "items": { "type": "string" }, "uniqueItems": true },
+    "evolution": { "type": "string", "enum": ["seedling", "apprentice", "specialist", "guardian"] },
+    "last_action": { "type": "string" }
+  }
+}
