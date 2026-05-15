@@ -16,6 +16,16 @@ This file records the exact blockers for honest on-device runtime completion on 
 3. There is no device-level proof on current `master` showing a selected local model generating a real response on-device.
 4. Because those pieces are missing, any PR that claims the local runtime is complete would be dishonest.
 
+## MLCSwift linking guardrail
+
+Do not fix local-runtime instability by reverting unrelated documentation, response guidance, plist cleanup, or Buddy UI model changes. The safe rollback boundary is the runtime dependency/linking surface itself:
+
+- `apps/openclaw-shell-ios/project.yml`
+- `apps/openclaw-shell-ios/OpenClawShell/RuntimeServices.swift`
+- any future vendored runtime framework or Swift package wiring
+
+If a future MLCSwift integration breaks the lead branch, revert or isolate that runtime wiring directly and leave unrelated docs, Info.plist formatting, and `BuddyAnimationMood` ownership intact.
+
 ## Honest definition of done
 
 A local-runtime PR is only complete when all of the following are true:

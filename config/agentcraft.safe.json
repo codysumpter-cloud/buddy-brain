@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "enabledByDefault": false,
+  "eventUrl": "http://localhost:2468/event",
+  "client": "bmo-stack",
+  "redactPrompts": true,
+  "maxCommandChars": 120,
+  "reportingMode": "optional-observability",
+  "failureMode": "do-not-fail-runtime",
+  "sourceOfTruth": [
+    "contracts/buddy_runtime.md",
+    "BUDDY_RUNTIME_EVENTS_FILES.md",
+    "docs/AGENTCRAFT_INTEGRATION.md"
+  ],
+  "allowedEventTypes": [
+    "hero_active",
+    "mission_start",
+    "file_access",
+    "bash_command",
+    "hero_idle"
+  ],
+  "nonGoals": [
+    "runtime authority",
+    "approval bypass",
+    "durable memory evidence",
+    "persistence receipt"
+  ]
+}

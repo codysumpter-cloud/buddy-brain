@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "runtime-profile.schema.json",
+  "title": "Omni-BMO Runtime Profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "environment_profile",
+    "latency_profile",
+    "transport_mode",
+    "omni_tool_route_mode",
+    "omni_fallback_to_ollama"
+  ],
+  "properties": {
+    "environment_profile": {
+      "type": "string",
+      "enum": ["desktop-dev", "pi-live", "demo-mode", "field"]
+    },
+    "latency_profile": {
+      "type": "string",
+      "enum": ["snappy", "balanced", "robust"]
+    },
+    "transport_mode": {
+      "type": "string",
+      "enum": ["online", "mesh", "reticulum_fallback", "auto"]
+    },
+    "omni_tool_route_mode": {
+      "type": "string",
+      "enum": ["off", "hybrid", "direct"]
+    },
+    "omni_fallback_to_ollama": {
+      "type": "boolean"
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}

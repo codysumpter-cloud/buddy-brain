@@ -1,0 +1,47 @@
+name: Govern forks and donors
+
+on:
+  schedule:
+    - cron: '31 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  govern-forks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+
+      - name: Verify governor token
+        env:
+          FORK_GOVERNOR_TOKEN: ${{ secrets.FORK_GOVERNOR_TOKEN }}
+        run: |
+          if [ -z "${FORK_GOVERNOR_TOKEN}" ]; then
+            echo "Missing repository secret FORK_GOVERNOR_TOKEN." >&2
+            echo "Grant it contents:write, pull-requests:write, workflows:write, and metadata read on your fork repos." >&2
+            exit 1
+          fi
+
+      - name: Refresh fork inventory and seed fork sync workflows
+        env:
+          FORK_GOVERNOR_TOKEN: ${{ secrets.FORK_GOVERNOR_TOKEN }}
+          GITHUB_OWNER: ${{ github.repository_owner }}
+          DONORS_PATH: DONORS.yaml
+        run: node scripts/fork-governor.mjs
+
+      - name: Open, update, merge, or close DONORS refresh PR
+        env:
+          GH_TOKEN: ${{ secrets.FORK_GOVERNOR_TOKEN }}
+          BASE_BRANCH: ${{ github.event.repository.default_branch }}
+          BRANCH_NAME: automation/fork-governor-sync
+          DONORS_PATH: DONORS.yaml
+        run: bash scripts/fork-governor-pr.sh

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "mode": "scheduler-runner-only",
+  "enabledByDefault": false,
+  "sourceOfTruth": [
+    "contracts/buddy_symphony.md",
+    "contracts/buddy_runtime.md",
+    "BUDDY_RUNTIME_EVENTS_FILES.md"
+  ],
+  "stateAuthority": "BMO Buddy runtime and state machine",
+  "schedulerAuthority": "Symphony-compatible runner",
+  "workspace": {
+    "root": "./.buddy-symphony/workspaces",
+    "isolationRequired": true,
+    "escapePolicy": "reject"
+  },
+  "receipts": {
+    "requiredForPersistenceClaims": true,
+    "requiredForGrowthEffects": true,
+    "requiredForMemoryPromotion": true
+  },
+  "growth": {
+    "directEffectsAllowed": false,
+    "acceptedRunMayRecommendGrowth": true,
+    "bmoMustApplyEffects": true
+  },
+  "approval": {
+    "riskyActionsRequireApproval": true,
+    "defaultDecision": "reject"
+  },
+  "proofKinds": [
+    "ci_status",
+    "diff",
+    "pr",
+    "review_feedback",
+    "complexity",
+    "walkthrough",
+    "artifact",
+    "receipt"
+  ],
+  "nonGoals": [
+    "Buddy memory store",
+    "Buddy state machine",
+    "approval bypass",
+    "public app runtime",
+    "unreceipted source mutation"
+  ]
+}

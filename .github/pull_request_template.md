@@ -1,20 +1,31 @@
 ## Summary
-
-<!-- What changed and why? -->
+- 
 
 ## Task contract
-- Plan: `context/plans/<yyyy-mm-dd-slug>.md`
+- Plan: PR_BODY
 - Verification: yes
 - Rollback: yes
 
-## Verification
-- [ ] Local verification completed
-- [ ] CI verification completed or expected checks identified
+## Problem
+Describe the operator, contract, automation, or integration problem this PR solves.
 
-## Rollback
-- [ ] Revert PR is sufficient
-- [ ] Any manual rollback steps are described below
+## Smallest useful wedge
+Describe the smallest safe change that moves the repo forward without overreaching.
+
+## Verification plan
+- [ ] Local verification completed
+- [ ] Required GitHub checks green before merge
+- [ ] Boundary reviewed (`bmo-stack` vs `prismtek-apps` vs `omni-bmo`)
+
+## Rollback plan
+Describe how to revert or disable this change safely.
+
+## Checklist
+- [ ] No secrets committed
+- [ ] Docs/templates/manifests updated if needed
+- [ ] No direct lead-branch writes
+- [ ] Merge only after green checks
 
 ## Notes
 
-<!-- Optional: risks, follow-ups, screenshots, or links -->
+Optional: risks, follow-ups, screenshots, or links.

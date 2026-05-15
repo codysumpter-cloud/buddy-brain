@@ -6,6 +6,7 @@ This document tracks the remaining canonical runtime / capability / identity wor
 
 - Keep the Hermes / BeMore capability contract as the canonical source of truth and verify downstream consumers match it.
 - Validate that the merged capability parity map still matches current runtime/operator expectations.
+- `master` is the active default branch and the earlier `main -> master` reconciliation removed the practical lead-branch drift. Only keep both names where compatibility or migration notes still require it.
 
 ## P1 — Canonical runtime gaps
 

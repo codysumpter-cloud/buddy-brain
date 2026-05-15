@@ -1,0 +1,402 @@
+version: 1
+owner: 'codysumpter-cloud'
+generated_by: 'scripts/fork-governor.mjs'
+generated_at: '2026-04-29T14:37:46.738Z'
+total_forks: 44
+forks:
+  - name: 'agentic-stack'
+    full_name: 'codysumpter-cloud/agentic-stack'
+    visibility: 'public'
+    default_branch: 'master'
+    html_url: 'https://github.com/codysumpter-cloud/agentic-stack'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'agentmemory'
+    full_name: 'codysumpter-cloud/agentmemory'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/agentmemory'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'arcade-mcp'
+    full_name: 'codysumpter-cloud/arcade-mcp'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/arcade-mcp'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'aseprite-windows-docker-build'
+    full_name: 'codysumpter-cloud/aseprite-windows-docker-build'
+    visibility: 'public'
+    default_branch: 'master'
+    html_url: 'https://github.com/codysumpter-cloud/aseprite-windows-docker-build'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'autoresearch'
+    full_name: 'codysumpter-cloud/autoresearch'
+    visibility: 'public'
+    default_branch: 'master'
+    html_url: 'https://github.com/codysumpter-cloud/autoresearch'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'awesome-hermes-agent'
+    full_name: 'codysumpter-cloud/awesome-hermes-agent'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/awesome-hermes-agent'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'be-more-agent'
+    full_name: 'codysumpter-cloud/be-more-agent'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/be-more-agent'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'bevy'
+    full_name: 'codysumpter-cloud/bevy'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/bevy'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'chumpy'
+    full_name: 'codysumpter-cloud/chumpy'
+    visibility: 'public'
+    default_branch: 'master'
+    html_url: 'https://github.com/codysumpter-cloud/chumpy'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'claw-code'
+    full_name: 'codysumpter-cloud/claw-code'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/claw-code'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'locked'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'context-mode'
+    full_name: 'codysumpter-cloud/context-mode'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/context-mode'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'docker-aseprite-linux'
+    full_name: 'codysumpter-cloud/docker-aseprite-linux'
+    visibility: 'public'
+    default_branch: 'master'
+    html_url: 'https://github.com/codysumpter-cloud/docker-aseprite-linux'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'gbrain'
+    full_name: 'codysumpter-cloud/gbrain'
+    visibility: 'public'
+    default_branch: 'master'
+    html_url: 'https://github.com/codysumpter-cloud/gbrain'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'hermes-agent'
+    full_name: 'codysumpter-cloud/hermes-agent'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/hermes-agent'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'hermes-agent-orange-book'
+    full_name: 'codysumpter-cloud/hermes-agent-orange-book'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/hermes-agent-orange-book'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'hermes-agent-self-evolution'
+    full_name: 'codysumpter-cloud/hermes-agent-self-evolution'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/hermes-agent-self-evolution'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'hermes-control-interface'
+    full_name: 'codysumpter-cloud/hermes-control-interface'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/hermes-control-interface'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'hermes-desktop'
+    full_name: 'codysumpter-cloud/hermes-desktop'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/hermes-desktop'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'hermes-ecosystem'
+    full_name: 'codysumpter-cloud/hermes-ecosystem'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/hermes-ecosystem'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'hermes-hudui'
+    full_name: 'codysumpter-cloud/hermes-hudui'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/hermes-hudui'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'hermes-lcm'
+    full_name: 'codysumpter-cloud/hermes-lcm'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/hermes-lcm'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'hermes-paperclip-adapter'
+    full_name: 'codysumpter-cloud/hermes-paperclip-adapter'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/hermes-paperclip-adapter'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'hermes-webui'
+    full_name: 'codysumpter-cloud/hermes-webui'
+    visibility: 'public'
+    default_branch: 'master'
+    html_url: 'https://github.com/codysumpter-cloud/hermes-webui'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'Hermes-Wiki'
+    full_name: 'codysumpter-cloud/Hermes-Wiki'
+    visibility: 'public'
+    default_branch: 'master'
+    html_url: 'https://github.com/codysumpter-cloud/Hermes-Wiki'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'hermes-workspace'
+    full_name: 'codysumpter-cloud/hermes-workspace'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/hermes-workspace'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'json-scada'
+    full_name: 'codysumpter-cloud/json-scada'
+    visibility: 'public'
+    default_branch: 'master'
+    html_url: 'https://github.com/codysumpter-cloud/json-scada'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'knowledge-forge'
+    full_name: 'codysumpter-cloud/knowledge-forge'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/knowledge-forge'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'learn-hermes-agent'
+    full_name: 'codysumpter-cloud/learn-hermes-agent'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/learn-hermes-agent'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'LiteRT-LM'
+    full_name: 'codysumpter-cloud/LiteRT-LM'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/LiteRT-LM'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'mcporter'
+    full_name: 'codysumpter-cloud/mcporter'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/mcporter'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'ml-intern'
+    full_name: 'codysumpter-cloud/ml-intern'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/ml-intern'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'mlc-llm'
+    full_name: 'codysumpter-cloud/mlc-llm'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/mlc-llm'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'mlx-swift'
+    full_name: 'codysumpter-cloud/mlx-swift'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/mlx-swift'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'mlx-swift-examples'
+    full_name: 'codysumpter-cloud/mlx-swift-examples'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/mlx-swift-examples'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'moonlight-docs'
+    full_name: 'codysumpter-cloud/moonlight-docs'
+    visibility: 'public'
+    default_branch: 'master'
+    html_url: 'https://github.com/codysumpter-cloud/moonlight-docs'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'nemoclaw'
+    full_name: 'codysumpter-cloud/nemoclaw'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/nemoclaw'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'OpenMythos'
+    full_name: 'codysumpter-cloud/OpenMythos'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/OpenMythos'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'pixellab-js'
+    full_name: 'codysumpter-cloud/pixellab-js'
+    visibility: 'public'
+    default_branch: 'master'
+    html_url: 'https://github.com/codysumpter-cloud/pixellab-js'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'pixellab-mcp'
+    full_name: 'codysumpter-cloud/pixellab-mcp'
+    visibility: 'public'
+    default_branch: 'master'
+    html_url: 'https://github.com/codysumpter-cloud/pixellab-mcp'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'pixellab-python'
+    full_name: 'codysumpter-cloud/pixellab-python'
+    visibility: 'public'
+    default_branch: 'master'
+    html_url: 'https://github.com/codysumpter-cloud/pixellab-python'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'sideband'
+    full_name: 'codysumpter-cloud/sideband'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/sideband'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'superpowers-zh'
+    full_name: 'codysumpter-cloud/superpowers-zh'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/superpowers-zh'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'tamagoscii'
+    full_name: 'codysumpter-cloud/tamagoscii'
+    visibility: 'public'
+    default_branch: 'claude/ascii-tamagotchi-game-kQSLl'
+    html_url: 'https://github.com/codysumpter-cloud/tamagoscii'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'
+  - name: 'twenty'
+    full_name: 'codysumpter-cloud/twenty'
+    visibility: 'public'
+    default_branch: 'main'
+    html_url: 'https://github.com/codysumpter-cloud/twenty'
+    upstream_full_name: null
+    archived: false
+    sync_workflow_status: 'unchanged'
+    sync_workflow_path: '.github/workflows/sync-fork-upstream.yml'

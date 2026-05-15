@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "transport-state.schema.json",
+  "title": "Omni-BMO Transport State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "selected_mode",
+    "requested_mode",
+    "last_reason",
+    "online_healthy",
+    "mesh_healthy",
+    "reticulum_available",
+    "last_transition_at",
+    "override_source"
+  ],
+  "properties": {
+    "selected_mode": {
+      "type": "string",
+      "enum": ["online", "mesh", "reticulum_fallback", "auto"]
+    },
+    "requested_mode": {
+      "type": "string",
+      "enum": ["online", "mesh", "reticulum_fallback", "auto"]
+    },
+    "last_reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "online_healthy": {
+      "type": "boolean"
+    },
+    "mesh_healthy": {
+      "type": "boolean"
+    },
+    "reticulum_available": {
+      "type": "boolean"
+    },
+    "last_transition_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "override_source": {
+      "type": "string",
+      "enum": ["none", "operator_hotkey", "operator_command", "config"]
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "@bmo/worldbox-agentcraft-tools",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Safe local tooling for WorldBox + AgentCraft experiments. Observation-first; no autonomous gameplay clicking.",
+  "type": "module",
+  "bin": {
+    "worldboxctl-safe": "./bin/worldboxctl-safe.mjs",
+    "agentcraft-worldbox-lite": "./bin/agentcraft-worldbox-lite.mjs",
+    "worldboxmod-plan": "./bin/worldboxmod-plan.mjs"
+  },
+  "scripts": {
+    "smoke": "node ./bin/worldboxctl-safe.mjs help && node ./bin/agentcraft-worldbox-lite.mjs help && node ./bin/worldboxmod-plan.mjs help"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}

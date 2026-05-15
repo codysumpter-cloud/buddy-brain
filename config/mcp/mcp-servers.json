@@ -1,0 +1,13 @@
+{
+  "servers": {
+    "local-files": {
+      "command": {
+        "kind": "stdio",
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-filesystem", "/Users/prismtek/bmo-stack"]
+      },
+      "auth": "none",
+      "keepAlive": true
+    }
+  }
+}
