@@ -6,6 +6,7 @@ import path from "node:path";
 const root = path.resolve(import.meta.dirname, "..");
 const skillsDir = path.join(root, "skills");
 const registryPath = path.join(skillsDir, "index.json");
+const collectionDirectories = new Set(["media"]);
 
 function fail(message) {
   console.error(`ERROR: ${message}`);
@@ -22,6 +23,19 @@ function section(text, heading, label) {
   const remaining = text.slice(start + heading.length);
   const nextHeading = remaining.search(/\n## /);
   return nextHeading === -1 ? remaining : remaining.slice(0, nextHeading);
+}
+
+function validateCollectionDirectory(directory) {
+  const readmePath = path.join(skillsDir, directory, "README.md");
+  ensureFile(
+    readmePath,
+    `collection directory '${directory}' must have ${path.relative(root, readmePath).replaceAll("\\", "/")}`,
+  );
+
+  const text = fs.readFileSync(readmePath, "utf8");
+  if (!text.includes("## Purpose")) {
+    fail(`collection directory '${directory}' must document a ## Purpose section`);
+  }
 }
 
 const registryRaw = fs.readFileSync(registryPath, "utf8");
@@ -78,6 +92,11 @@ const skillDirectories = fs
 const registeredSkills = Object.keys(skills).sort();
 
 for (const directory of skillDirectories) {
+  if (collectionDirectories.has(directory)) {
+    validateCollectionDirectory(directory);
+    continue;
+  }
+
   if (!skills[directory]) fail(`skills/${directory} exists but is missing from skills/index.json`);
 }
 
@@ -110,4 +129,4 @@ for (const token of ["`skills/README.md`", "`skills/index.json`"]) {
   }
 }
 
-console.log("skills registry and skill docs are valid");
+console.log("skills registry, collection bundles, and skill docs are valid");
