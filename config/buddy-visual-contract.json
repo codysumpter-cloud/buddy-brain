@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "name": "buddy-brain-visual-contract",
+  "display_name": "Buddy Brain Visual Contract",
+  "canonical_buddy_style": {
+    "body": "round mint/cyan pixel-pet body",
+    "outline": "deep navy high-contrast pixel outline",
+    "ears": "heart-shaped antler ears",
+    "tuft": "small top tuft",
+    "face": "large soft face panel with dot eyes, small smile, and plus/blush cheeks",
+    "limbs": "tiny side arms and rounded feet",
+    "charm": "gold heart belly charm",
+    "highlights": "asymmetric cyan and white pixel highlights",
+    "background": "transparent for reusable runtime/app assets"
+  },
+  "palette": {
+    "outline": "#08165c",
+    "cyan_shadow": "#56d6d2",
+    "mint_body": "#8ee9df",
+    "face_panel": "#cffff2",
+    "highlight": "#effff9",
+    "gold_heart": "#ffd45e",
+    "heart_shadow": "#f69c45",
+    "eye_highlight": "#f8fbff"
+  },
+  "render_modes": ["pixel", "ascii"],
+  "states": ["idle", "happy", "thinking", "sleepy"],
+  "animation": {
+    "cycle": ["idle", "happy", "thinking", "sleepy"],
+    "frame_duration_ms": 900,
+    "loop": true,
+    "reduced_motion_state": "idle"
+  },
+  "assets": {
+    "readme_mascot": "assets/buddy-brain-mascot.svg",
+    "default_pixel": "assets/default-buddy.svg"
+  },
+  "rules": {
+    "buddy_is_pet": true,
+    "device_shape_allowed": false,
+    "transparent_background": true,
+    "prefer_crisp_pixels": true,
+    "avoid_blur": true,
+    "avoid_3d_mascot_style": true,
+    "avoid_existing_character_silhouette": true
+  },
+  "repo_overlay": {
+    "allowed_motifs": [
+      "operator brain",
+      "policy",
+      "council",
+      "memory",
+      "repo status",
+      "review state"
+    ],
+    "must_preserve_base_buddy_silhouette": true
+  }
+}
