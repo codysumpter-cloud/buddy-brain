@@ -51,6 +51,14 @@ as a reliability bug and fix the contract before trusting startup state.
 - When a change is durable, update the source-of-truth docs or code instead of relying on ephemeral runtime memory.
 - Record resumable state in `TASK_STATE.md` and `WORK_IN_PROGRESS.md` when the work meaningfully changes repo or runtime posture.
 
+## Buddy + Lil' Buddy Default
+
+- Future Buddy ecosystem prompts default to `Human -> Buddy Orchestrator -> Lil' Buddy Worker(s) -> Buddy Review -> Human-facing response`.
+- Use at least one Lil' Buddy worker unless the human explicitly disables delegation for the current task.
+- Buddy owns intent, planning, delegation, review, safety gates, escalation, and the final human-facing response.
+- Lil' Buddy executes only scoped task envelopes, returns structured results, and never bypasses Buddy Review.
+- The governance source is `context/council/BUDDY_LIL_BUDDY_ORCHESTRATION.md`; the prompt rule is `context/prompt-governance/BUDDY_LIL_BUDDY_PROMPT_STANDARD.md`; the machine-readable contract is `config/runtime/buddy-lil-buddy-contract.json`.
+
 ## Council Transparency
 
 - BMO owns the user-facing thread and final synthesis.
