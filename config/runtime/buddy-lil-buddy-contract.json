@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "buddy.orchestration.v1",
+  "policyId": "buddy-lil-buddy-default-orchestration",
+  "status": "active",
+  "defaultEnabled": true,
+  "explicitDisablementPhrases": [
+    "Answer directly without Buddy/Lil' Buddy routing.",
+    "Do not delegate this task.",
+    "Skip orchestration for this one."
+  ],
+  "defaultFlow": [
+    "human_intent",
+    "buddy_plan",
+    "lil_buddy_task_envelope",
+    "lil_buddy_result_envelope",
+    "buddy_review",
+    "safety_escalation_gate",
+    "human_facing_response"
+  ],
+  "agents": {
+    "buddy": {
+      "role": "orchestrator",
+      "owns": [
+        "user_intent",
+        "planning",
+        "delegation",
+        "review",
+        "safety_gates",
+        "final_response"
+      ]
+    },
+    "lilBuddy": {
+      "role": "scoped_worker",
+      "owns": [
+        "delegated_execution",
+        "structured_results",
+        "risk_reporting",
+        "open_questions"
+      ],
+      "forbidden": [
+        "override_buddy",
+        "bypass_review",
+        "use_unapproved_tools",
+        "produce_unreviewed_final_response"
+      ]
+    }
+  },
+  "toolContracts": [
+    "read-only",
+    "draft-only",
+    "local-execution",
+    "repo-mutation",
+    "device-observation",
+    "device-action",
+    "external-action"
+  ],
+  "reviewStatuses": [
+    "approved",
+    "approved_with_notes",
+    "revise",
+    "escalate",
+    "block"
+  ],
+  "escalationClasses": [
+    "credential",
+    "money",
+    "identity",
+    "external-write",
+    "destructive",
+    "device-action",
+    "private-data",
+    "network-enable",
+    "high-stakes-current-claim"
+  ],
+  "sourceOfTruth": {
+    "durableKnowledge": "knowledge-vault/99-System/Buddy Standards/",
+    "governance": "buddy-brain/context/council/",
+    "runtime": "buddy-agent/src/buddy_agent/orchestration/",
+    "deviceRuntime": "omni-buddy/docs/"
+  }
+}
