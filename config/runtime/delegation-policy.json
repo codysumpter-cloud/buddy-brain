@@ -1,8 +1,11 @@
 {
-  "version": "2026-03-30.v1",
+  "version": "2026-06-12.v2",
   "policyId": "bmo-runtime-delegation-policy",
   "defaults": {
     "requireVerifierBeforeComplete": true,
+    "defaultOrchestrationContract": "buddy-lil-buddy-default-orchestration",
+    "defaultOrchestrationContractPath": "config/runtime/buddy-lil-buddy-contract.json",
+    "alwaysUseBuddyLilBuddyUnlessExplicitlyDisabled": true,
     "maxDelegationDepth": 2,
     "maxRetriesPerTask": 1,
     "maxChildrenPerTask": 3,
@@ -10,9 +13,20 @@
     "defaultWorkerProfileId": "safe-readonly",
     "defaultConflictMode": "escalate-to-host"
   },
+  "requiredLoop": [
+    "buddy-intent-capture",
+    "buddy-plan",
+    "lil-buddy-scoped-execution",
+    "buddy-review",
+    "safety-escalation-gate",
+    "human-facing-response"
+  ],
   "forbidden": [
     "canonical-state-in-disposable-worker",
     "direct-external-channel-binding-on-worker",
-    "completion-claim-without-verifier-evidence"
+    "completion-claim-without-verifier-evidence",
+    "lil-buddy-overrides-buddy",
+    "worker-bypasses-buddy-review",
+    "unapproved-tool-contract"
   ]
 }
