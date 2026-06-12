@@ -18,8 +18,8 @@ TEMPLATES = {
     },
     "guarded-evolution": {
         "steps": [
-            {"name": "validate", "run": "node scripts/validate-skills.mjs"},
-            {"name": "confidence", "run": "python3 scripts/skill_confidence.py"},
+            {"name": "validate-scripts", "run": "node --check scripts/validate-skills.mjs && python3 -m py_compile scripts/skill_confidence.py scripts/skill_health.py scripts/skill_decay.py"},
+            {"name": "confidence", "run": "python3 scripts/skill_confidence.py --output workflows/guarded-evolution-scorecard.json"},
             {"name": "health", "run": "python3 scripts/skill_health.py"},
             {"name": "decay", "run": "python3 scripts/skill_decay.py"},
         ]
