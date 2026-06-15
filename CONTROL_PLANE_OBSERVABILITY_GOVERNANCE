@@ -1,0 +1,18 @@
+# Plan
+
+## Problem
+
+This change needs a repo-local plan reference for readiness checks.
+
+## Smallest useful wedge
+
+Add this small plan file.
+
+## Verification plan
+
+- Confirm this file exists.
+- Confirm the readiness check passes.
+
+## Rollback plan
+
+Delete this file.
