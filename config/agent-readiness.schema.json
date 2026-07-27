@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prismtek.dev/schemas/agent-readiness.schema.json",
+  "title": "Buddy repository agent readiness report",
+  "type": "object",
+  "required": ["version", "repository", "score", "classification", "dimensions", "blockers", "next_actions"],
+  "properties": {
+    "version": { "const": 1 },
+    "repository": { "type": "string" },
+    "score": { "type": "number", "minimum": 0, "maximum": 100 },
+    "classification": { "enum": ["blocked", "supervised", "ready", "high-confidence"] },
+    "dimensions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["score", "evidence", "gaps"],
+        "properties": {
+          "score": { "type": "number", "minimum": 0, "maximum": 100 },
+          "evidence": { "type": "array", "items": { "type": "string" } },
+          "gaps": { "type": "array", "items": { "type": "string" } }
+        },
+        "additionalProperties": false
+      }
+    },
+    "blockers": { "type": "array", "items": { "type": "string" } },
+    "next_actions": { "type": "array", "items": { "type": "string" } }
+  },
+  "additionalProperties": false
+}
