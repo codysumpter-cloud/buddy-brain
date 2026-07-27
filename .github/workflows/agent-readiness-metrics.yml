@@ -1,0 +1,41 @@
+name: Agent readiness metrics
+
+on:
+  pull_request:
+    paths:
+      - "scripts/buddy_agent_readiness.py"
+      - "scripts/buddy_task_economics.py"
+      - "tests/test_agent_readiness.py"
+      - "tests/test_task_economics.py"
+      - "config/agent-readiness*.json"
+      - "config/task-economics.schema.json"
+      - ".github/workflows/agent-readiness-metrics.yml"
+  push:
+    branches: [master]
+    paths:
+      - "scripts/buddy_agent_readiness.py"
+      - "scripts/buddy_task_economics.py"
+      - "tests/test_agent_readiness.py"
+      - "tests/test_task_economics.py"
+      - "config/agent-readiness*.json"
+      - "config/task-economics.schema.json"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONPATH: ${{ github.workspace }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m pip install pytest
+      - run: python -m py_compile scripts/buddy_agent_readiness.py scripts/buddy_task_economics.py
+      - run: python -m pytest -q tests/test_agent_readiness.py tests/test_task_economics.py
+      - name: Score this repository without treating missing telemetry as success
+        run: python scripts/buddy_agent_readiness.py . --format json --output /tmp/readiness.json

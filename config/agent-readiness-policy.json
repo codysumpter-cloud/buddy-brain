@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "weights": {
+    "instruction_coverage": 20,
+    "deterministic_setup": 15,
+    "test_coverage": 20,
+    "browser_verification": 10,
+    "security_gate": 15,
+    "agent_pr_acceptance": 10,
+    "median_review_rework": 10
+  },
+  "thresholds": {
+    "blocked": 0,
+    "supervised": 50,
+    "ready": 75,
+    "high_confidence": 90
+  },
+  "required_for_unattended": [
+    "AGENTS.md",
+    "REVIEW.md",
+    ".buddy/policy.yaml",
+    "tests",
+    "security"
+  ]
+}

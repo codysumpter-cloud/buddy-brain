@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prismtek.dev/schemas/task-economics.schema.json",
+  "title": "Buddy task economics record",
+  "type": "object",
+  "required": ["task_id", "provider", "model", "attempts", "model_cost", "tool_cost", "elapsed_ms", "human_review_minutes", "verification_passed", "artifacts_accepted"],
+  "properties": {
+    "task_id": { "type": "string", "minLength": 1 },
+    "repository": { "type": "string" },
+    "workflow": { "type": "string" },
+    "provider": { "type": "string", "minLength": 1 },
+    "model": { "type": "string", "minLength": 1 },
+    "attempts": { "type": "integer", "minimum": 1 },
+    "model_cost": { "type": "number", "minimum": 0 },
+    "tool_cost": { "type": "number", "minimum": 0 },
+    "elapsed_ms": { "type": "integer", "minimum": 0 },
+    "human_review_minutes": { "type": "number", "minimum": 0 },
+    "verification_passed": { "type": "boolean" },
+    "artifacts_accepted": { "type": "boolean" },
+    "rolled_back": { "type": "boolean", "default": false },
+    "security_gate": { "enum": ["pass", "review", "block", "not-run"] },
+    "input_tokens": { "type": "integer", "minimum": 0 },
+    "output_tokens": { "type": "integer", "minimum": 0 }
+  },
+  "additionalProperties": true
+}
