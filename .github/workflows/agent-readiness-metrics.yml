@@ -27,6 +27,8 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    env:
+      PYTHONPATH: ${{ github.workspace }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -34,6 +36,6 @@ jobs:
           python-version: "3.12"
       - run: python -m pip install pytest
       - run: python -m py_compile scripts/buddy_agent_readiness.py scripts/buddy_task_economics.py
-      - run: pytest -q tests/test_agent_readiness.py tests/test_task_economics.py
+      - run: python -m pytest -q tests/test_agent_readiness.py tests/test_task_economics.py
       - name: Score this repository without treating missing telemetry as success
         run: python scripts/buddy_agent_readiness.py . --format json --output /tmp/readiness.json
