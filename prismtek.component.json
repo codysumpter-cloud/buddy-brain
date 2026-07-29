@@ -1,0 +1,53 @@
+{
+  "$schema": "https://raw.githubusercontent.com/codysumpter-cloud/buddy-universal-agent-profile/main/schemas/prismtek-component.schema.json",
+  "schema_version": "1.0",
+  "component": "buddy-brain",
+  "repository": "codysumpter-cloud/buddy-brain",
+  "role": "governance, council policy, repository readiness, routing feedback, and verified-outcome economics",
+  "owns": [
+    "governance",
+    "policy",
+    "readiness-scoring",
+    "routing-feedback",
+    "outcome-economics"
+  ],
+  "provides": [
+    {
+      "contract": "buddy.policy-report.v1",
+      "path": "scripts/buddy_trust_fabric_report.py"
+    },
+    {
+      "contract": "buddy.task-economics-report.v1",
+      "path": "scripts/buddy_task_economics.py"
+    }
+  ],
+  "consumes": [
+    {
+      "contract": "buddy.policy-decision.v1",
+      "from": "buddy-agent"
+    },
+    {
+      "contract": "buddy.task-economics.v1",
+      "from": "buddy-agent"
+    },
+    {
+      "contract": "knowledge.graph.v1",
+      "from": "knowledge-vault"
+    }
+  ],
+  "events": {
+    "emits": [
+      "policy_decision_made",
+      "council_update"
+    ],
+    "receives": [
+      "evidence_evaluated",
+      "execution_verified"
+    ]
+  },
+  "health_checks": [
+    "pytest -q tests/test_trust_fabric_report.py",
+    "python -m py_compile scripts/buddy_trust_fabric_report.py"
+  ],
+  "stack_map": "https://github.com/codysumpter-cloud/buddy-universal-agent-profile/blob/main/linked-repos/prismtek-stack.manifest.json"
+}
