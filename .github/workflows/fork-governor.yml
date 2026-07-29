@@ -1,17 +1,27 @@
 name: Govern forks and donors
 
 on:
-  schedule:
-    - cron: '31 */6 * * *'
+  push:
+    branches:
+      - master
+    paths:
+      - '.github/workflows/fork-governor.yml'
+      - 'scripts/fork-governor.mjs'
+      - 'scripts/fork-sync-policy.mjs'
   workflow_dispatch:
 
 permissions:
   contents: write
   pull-requests: write
 
+concurrency:
+  group: fork-governor
+  cancel-in-progress: true
+
 jobs:
   govern-forks:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -31,12 +41,18 @@ jobs:
             exit 1
           fi
 
-      - name: Refresh fork inventory and seed fork sync workflows
+      - name: Refresh fork inventory
         env:
           FORK_GOVERNOR_TOKEN: ${{ secrets.FORK_GOVERNOR_TOKEN }}
           GITHUB_OWNER: ${{ github.repository_owner }}
           DONORS_PATH: DONORS.yaml
         run: node scripts/fork-governor.mjs
+
+      - name: Enforce manual conflict-safe fork sync policy
+        env:
+          FORK_GOVERNOR_TOKEN: ${{ secrets.FORK_GOVERNOR_TOKEN }}
+          GITHUB_OWNER: ${{ github.repository_owner }}
+        run: node scripts/fork-sync-policy.mjs
 
       - name: Open, update, merge, or close DONORS refresh PR
         env:
