@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "scripts/buddy_trust_fabric_report.py"
+      - "scripts/__init__.py"
       - "tests/test_trust_fabric_report.py"
       - "prismtek.component.json"
       - "PRISMTEK_STACK.md"
@@ -11,6 +12,7 @@ on:
   pull_request:
     paths:
       - "scripts/buddy_trust_fabric_report.py"
+      - "scripts/__init__.py"
       - "tests/test_trust_fabric_report.py"
       - "prismtek.component.json"
       - "PRISMTEK_STACK.md"
@@ -33,4 +35,6 @@ jobs:
       - name: Compile report
         run: python -m py_compile scripts/buddy_trust_fabric_report.py
       - name: Run focused tests
-        run: pytest -q tests/test_trust_fabric_report.py
+        env:
+          PYTHONPATH: .
+        run: python -m pytest -q tests/test_trust_fabric_report.py
