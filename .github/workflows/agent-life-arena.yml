@@ -1,0 +1,32 @@
+name: Agent Life arena
+
+on:
+  pull_request:
+    paths:
+      - "scripts/agent_life_arena_score.py"
+      - "tests/test_agent_life_arena_score.py"
+      - "docs/AGENT_LIFE_ARENA.md"
+      - ".github/workflows/agent-life-arena.yml"
+  push:
+    branches: [master]
+    paths:
+      - "scripts/agent_life_arena_score.py"
+      - "tests/test_agent_life_arena_score.py"
+      - "docs/AGENT_LIFE_ARENA.md"
+
+permissions:
+  contents: read
+
+jobs:
+  score-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile arena scorer
+        run: python -m py_compile scripts/agent_life_arena_score.py
+      - name: Test independent scoring and tamper rejection
+        run: python -m unittest -v tests/test_agent_life_arena_score.py
