@@ -1,0 +1,34 @@
+name: Norn parity score
+
+on:
+  pull_request:
+    paths:
+      - "scripts/norn_parity_score.py"
+      - "tests/test_norn_parity_score.py"
+      - "docs/NORN_PARITY_SCORE.md"
+      - ".github/workflows/norn-parity-score.yml"
+  push:
+    branches: [master]
+    paths:
+      - "scripts/norn_parity_score.py"
+      - "tests/test_norn_parity_score.py"
+      - "docs/NORN_PARITY_SCORE.md"
+      - ".github/workflows/norn-parity-score.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  score-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Compile scorer
+        run: python -m py_compile scripts/norn_parity_score.py
+      - name: Test independent measurements and tamper rejection
+        run: python -m unittest -v tests/test_norn_parity_score.py
