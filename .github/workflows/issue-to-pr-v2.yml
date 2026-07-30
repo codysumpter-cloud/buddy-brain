@@ -33,7 +33,7 @@ jobs:
       executor_allowed: ${{ steps.plan.outputs.executor_allowed }}
       execution_mode: ${{ steps.plan.outputs.execution_mode }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - id: issue
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
@@ -100,7 +100,7 @@ jobs:
       vars.BMO_AUTONOMY_EXECUTION_ENABLED == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - uses: actions/download-artifact@v8

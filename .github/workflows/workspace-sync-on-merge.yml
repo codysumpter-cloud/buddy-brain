@@ -26,7 +26,7 @@ jobs:
     runs-on: ${{ fromJSON(vars.BMO_WORKSPACE_SYNC_RUNS_ON != '' && vars.BMO_WORKSPACE_SYNC_RUNS_ON || '["self-hosted"]') }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.event_name == 'workflow_dispatch' && inputs.ref || github.ref }}
 
