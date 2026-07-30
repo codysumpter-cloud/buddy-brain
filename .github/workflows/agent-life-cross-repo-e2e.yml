@@ -14,9 +14,9 @@ permissions:
   contents: read
 
 env:
-  BUAP_SHA: cd40fb7ea875a3a3f9ea0da1cc4c64b9ec565fb4
-  BUDDY_AGENT_SHA: 5debb5e12ca1727902840104222205b41e9686d5
-  KNOWLEDGE_VAULT_SHA: 267b3fc69fc5765a1c7d55ebd4d793ee8b779308
+  BUAP_SHA: 87c6504a7b1b1f5b3ab97dca7a419ad0136555eb
+  BUDDY_AGENT_SHA: a6624b9104cebd6d114334ec8228f3aae765246e
+  KNOWLEDGE_VAULT_SHA: a5bbe97de89f7ffecfd5cc39fb12839bb5a7fa52
 
 jobs:
   prove:
@@ -29,21 +29,21 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           path: brain
 
-      - name: Check out BUAP exact green head
+      - name: Check out merged BUAP commit
         uses: actions/checkout@v4
         with:
           repository: codysumpter-cloud/buddy-universal-agent-profile
           ref: ${{ env.BUAP_SHA }}
           path: buap
 
-      - name: Check out Buddy Agent exact green head
+      - name: Check out merged Buddy Agent commit
         uses: actions/checkout@v4
         with:
           repository: codysumpter-cloud/buddy-agent
           ref: ${{ env.BUDDY_AGENT_SHA }}
           path: agent
 
-      - name: Check out Knowledge Vault exact green head
+      - name: Check out merged Knowledge Vault commit
         uses: actions/checkout@v4
         with:
           repository: codysumpter-cloud/knowledge-vault
