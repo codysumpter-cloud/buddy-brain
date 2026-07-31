@@ -10,7 +10,13 @@ import json
 from pathlib import Path
 from typing import Any, Callable
 
-RECEIPT_SCHEMA = "prismtek-norn-memory-navigation-skills-receipt-v1"
+# The runtime retired the legacy token from its own vocabulary, but a receipt that has
+# already been published cannot be re-emitted -- and a score is only meaningful if the
+# scorer can still read the evidence it was asked to judge. Both spellings are accepted;
+# the receipt names itself, and this file does not care which name it chose.
+RECEIPT_SCHEMA = "prismtek-buddy_life-memory-navigation-skills-receipt-v1"
+LEGACY_RECEIPT_SCHEMA = "prismtek-norn-memory-navigation-skills-receipt-v1"
+ACCEPTED_RECEIPT_SCHEMAS = (RECEIPT_SCHEMA, LEGACY_RECEIPT_SCHEMA)
 SCORE_SCHEMA = "prismtek-norn-memory-navigation-skills-score-v1"
 REQUIRED_MEASUREMENTS = {
     "autobiographical_recall": 15,
@@ -23,7 +29,7 @@ REQUIRED_MEASUREMENTS = {
 }
 
 
-class NornMemoryNavigationSkillsScoreError(ValueError):
+class BuddyLifeMemoryNavigationSkillsScoreError(ValueError):
     """The source receipt is malformed, tampered with, or incomplete."""
 
 
@@ -41,37 +47,37 @@ def _without_hash(value: dict[str, Any]) -> dict[str, Any]:
 def _verify_hash(receipt: dict[str, Any]) -> None:
     supplied = str(receipt.get("receipt_sha256", ""))
     if not supplied:
-        raise NornMemoryNavigationSkillsScoreError("receipt is missing receipt_sha256")
+        raise BuddyLifeMemoryNavigationSkillsScoreError("receipt is missing receipt_sha256")
     if supplied != _digest(_without_hash(receipt)):
-        raise NornMemoryNavigationSkillsScoreError("receipt hash mismatch")
+        raise BuddyLifeMemoryNavigationSkillsScoreError("receipt hash mismatch")
 
 
 def _number(value: Any, field: str) -> float:
     if isinstance(value, bool):
-        raise NornMemoryNavigationSkillsScoreError(f"{field} must be numeric")
+        raise BuddyLifeMemoryNavigationSkillsScoreError(f"{field} must be numeric")
     try:
         return float(value)
     except (TypeError, ValueError) as error:
-        raise NornMemoryNavigationSkillsScoreError(f"{field} must be numeric") from error
+        raise BuddyLifeMemoryNavigationSkillsScoreError(f"{field} must be numeric") from error
 
 
 def _measurement_map(receipt: dict[str, Any]) -> dict[str, dict[str, Any]]:
     raw = receipt.get("measurements")
     if not isinstance(raw, dict):
-        raise NornMemoryNavigationSkillsScoreError("receipt.measurements must be an object")
+        raise BuddyLifeMemoryNavigationSkillsScoreError("receipt.measurements must be an object")
     result: dict[str, dict[str, Any]] = {}
     for key, value in raw.items():
         if not isinstance(value, dict):
-            raise NornMemoryNavigationSkillsScoreError(f"measurement {key} must be an object")
+            raise BuddyLifeMemoryNavigationSkillsScoreError(f"measurement {key} must be an object")
         result[str(key)] = value
     missing = sorted(set(REQUIRED_MEASUREMENTS) - set(result))
     extra = sorted(set(result) - set(REQUIRED_MEASUREMENTS))
     if missing:
-        raise NornMemoryNavigationSkillsScoreError(
+        raise BuddyLifeMemoryNavigationSkillsScoreError(
             f"missing required measurements: {', '.join(missing)}"
         )
     if extra:
-        raise NornMemoryNavigationSkillsScoreError(
+        raise BuddyLifeMemoryNavigationSkillsScoreError(
             f"unknown measurements: {', '.join(extra)}"
         )
     return result
@@ -123,7 +129,7 @@ def _judge_semantic(row: dict[str, Any]) -> tuple[bool, dict[str, Any]]:
 def _judge_spatial(row: dict[str, Any]) -> tuple[bool, dict[str, Any]]:
     raw_rooms = row.get("route_rooms")
     if not isinstance(raw_rooms, list):
-        raise NornMemoryNavigationSkillsScoreError("spatial_routing.route_rooms must be an array")
+        raise BuddyLifeMemoryNavigationSkillsScoreError("spatial_routing.route_rooms must be an array")
     rooms = [str(value) for value in raw_rooms]
     steps = int(_number(row.get("steps"), "spatial_routing.steps"))
     host_validated = bool(row.get("host_validated", False))
@@ -214,10 +220,10 @@ JUDGES: dict[str, Judge] = {
 }
 
 
-def score_norn_memory_navigation_skills_receipt(receipt: dict[str, Any]) -> dict[str, Any]:
+def score_buddy_life_memory_navigation_skills_receipt(receipt: dict[str, Any]) -> dict[str, Any]:
     """Recompute the source hash and independently judge all seven domains."""
-    if receipt.get("schema") != RECEIPT_SCHEMA:
-        raise NornMemoryNavigationSkillsScoreError("unsupported receipt schema")
+    if receipt.get("schema") not in ACCEPTED_RECEIPT_SCHEMAS:
+        raise BuddyLifeMemoryNavigationSkillsScoreError("unsupported receipt schema")
     _verify_hash(receipt)
     measurements = _measurement_map(receipt)
 
@@ -246,7 +252,7 @@ def score_norn_memory_navigation_skills_receipt(receipt: dict[str, Any]) -> dict
     passed = independently_passed and runtime_summary_consistent and awarded == 100
     score: dict[str, Any] = {
         "schema": SCORE_SCHEMA,
-        "source_schema": RECEIPT_SCHEMA,
+        "source_schema": str(receipt.get("schema", RECEIPT_SCHEMA)),
         "source_receipt_sha256": str(receipt["receipt_sha256"]),
         "score": awarded,
         "maximum_score": 100,
@@ -275,9 +281,9 @@ def main() -> int:
     try:
         parsed = json.loads(args.receipt.read_text(encoding="utf-8"))
         if not isinstance(parsed, dict):
-            raise NornMemoryNavigationSkillsScoreError("receipt root must be an object")
-        score = score_norn_memory_navigation_skills_receipt(parsed)
-    except (OSError, json.JSONDecodeError, NornMemoryNavigationSkillsScoreError) as error:
+            raise BuddyLifeMemoryNavigationSkillsScoreError("receipt root must be an object")
+        score = score_buddy_life_memory_navigation_skills_receipt(parsed)
+    except (OSError, json.JSONDecodeError, BuddyLifeMemoryNavigationSkillsScoreError) as error:
         print(f"memory/navigation/skills score failed: {error}")
         return 1
     encoded = json.dumps(score, indent=2, sort_keys=True) + "\n"

@@ -10,15 +10,23 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from norn_modern_cognition_score import (  # noqa: E402
-    NornModernCognitionScoreError,
-    score_norn_modern_cognition_receipt,
+from buddy_life_modern_cognition_score import (  # noqa: E402
+    LEGACY_RECEIPT_SCHEMA,
+    RECEIPT_SCHEMA,
+    BuddyLifeModernCognitionScoreError,
+    score_buddy_life_modern_cognition_receipt,
 )
 
 
 def _digest(value: object) -> str:
     encoded = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+
+
+def _reseal(receipt: dict[str, object]) -> None:
+    """Re-stamp the receipt hash after editing it, the way the runtime stamps it."""
+    receipt.pop("receipt_sha256", None)
+    receipt["receipt_sha256"] = _digest(receipt)
 
 
 def _receipt() -> dict[str, object]:
@@ -83,9 +91,26 @@ def _rehash(receipt: dict[str, object]) -> None:
     )
 
 
-class NornModernCognitionScoreTests(unittest.TestCase):
+class BuddyLifeModernCognitionScoreTests(unittest.TestCase):
+    def test_current_and_legacy_receipt_schemas_both_score(self) -> None:
+        """A published receipt keeps its old name; a fresh one carries the new one."""
+        legacy = _receipt()
+        self.assertEqual(legacy["schema"], LEGACY_RECEIPT_SCHEMA)
+        legacy_score = score_buddy_life_modern_cognition_receipt(legacy)
+
+        current = _receipt()
+        current["schema"] = RECEIPT_SCHEMA
+        _reseal(current)
+        current_score = score_buddy_life_modern_cognition_receipt(current)
+
+        self.assertTrue(legacy_score["passed"])
+        self.assertTrue(current_score["passed"])
+        self.assertEqual(legacy_score["score"], current_score["score"])
+        self.assertEqual(legacy_score["source_schema"], LEGACY_RECEIPT_SCHEMA)
+        self.assertEqual(current_score["source_schema"], RECEIPT_SCHEMA)
+
     def test_exact_green_receipt_scores_one_hundred(self) -> None:
-        score = score_norn_modern_cognition_receipt(_receipt())
+        score = score_buddy_life_modern_cognition_receipt(_receipt())
         self.assertTrue(score["passed"])
         self.assertEqual(score["score"], 100)
         self.assertEqual(score["readiness"], "green")
@@ -99,7 +124,7 @@ class NornModernCognitionScoreTests(unittest.TestCase):
         assert isinstance(delayed, dict)
         delayed["early_value"] = delayed["recent_value"]
         _rehash(receipt)
-        score = score_norn_modern_cognition_receipt(receipt)
+        score = score_buddy_life_modern_cognition_receipt(receipt)
         self.assertFalse(score["passed"])
         self.assertEqual(score["score"], 85)
         judgment = next(item for item in score["judgments"] if item["id"] == "delayed_credit")
@@ -113,7 +138,7 @@ class NornModernCognitionScoreTests(unittest.TestCase):
         assert isinstance(curiosity, dict)
         curiosity["noisy_score"] = 0.60
         _rehash(receipt)
-        score = score_norn_modern_cognition_receipt(receipt)
+        score = score_buddy_life_modern_cognition_receipt(receipt)
         self.assertFalse(score["passed"])
         judgment = next(item for item in score["judgments"] if item["id"] == "curiosity")
         self.assertFalse(judgment["passed"])
@@ -127,7 +152,7 @@ class NornModernCognitionScoreTests(unittest.TestCase):
         culture["transfer_bound"] = 0.90
         culture["learner_skill"] = 0.88
         _rehash(receipt)
-        score = score_norn_modern_cognition_receipt(receipt)
+        score = score_buddy_life_modern_cognition_receipt(receipt)
         self.assertFalse(score["passed"])
         judgment = next(item for item in score["judgments"] if item["id"] == "culture")
         self.assertFalse(judgment["passed"])
@@ -140,7 +165,7 @@ class NornModernCognitionScoreTests(unittest.TestCase):
         assert isinstance(cortex, dict)
         cortex["authority_escape_rejected"] = False
         _rehash(receipt)
-        score = score_norn_modern_cognition_receipt(receipt)
+        score = score_buddy_life_modern_cognition_receipt(receipt)
         self.assertFalse(score["passed"])
         judgment = next(item for item in score["judgments"] if item["id"] == "cortex")
         self.assertFalse(judgment["passed"])
@@ -150,7 +175,7 @@ class NornModernCognitionScoreTests(unittest.TestCase):
         receipt["passed_count"] = 6
         receipt["failed_count"] = 1
         _rehash(receipt)
-        score = score_norn_modern_cognition_receipt(receipt)
+        score = score_buddy_life_modern_cognition_receipt(receipt)
         self.assertEqual(score["score"], 100)
         self.assertFalse(score["runtime_summary_consistent"])
         self.assertFalse(score["passed"])
@@ -161,8 +186,8 @@ class NornModernCognitionScoreTests(unittest.TestCase):
         assert isinstance(measurements, dict)
         del measurements["planning"]
         _rehash(receipt)
-        with self.assertRaisesRegex(NornModernCognitionScoreError, "missing required"):
-            score_norn_modern_cognition_receipt(receipt)
+        with self.assertRaisesRegex(BuddyLifeModernCognitionScoreError, "missing required"):
+            score_buddy_life_modern_cognition_receipt(receipt)
 
     def test_payload_tampering_is_rejected(self) -> None:
         receipt = _receipt()
@@ -171,14 +196,14 @@ class NornModernCognitionScoreTests(unittest.TestCase):
         planning = measurements["planning"]
         assert isinstance(planning, dict)
         planning["host_validated"] = False
-        with self.assertRaisesRegex(NornModernCognitionScoreError, "hash mismatch"):
-            score_norn_modern_cognition_receipt(receipt)
+        with self.assertRaisesRegex(BuddyLifeModernCognitionScoreError, "hash mismatch"):
+            score_buddy_life_modern_cognition_receipt(receipt)
 
     def test_scoring_is_deterministic_and_non_mutating(self) -> None:
         receipt = _receipt()
         before = copy.deepcopy(receipt)
-        first = score_norn_modern_cognition_receipt(receipt)
-        second = score_norn_modern_cognition_receipt(receipt)
+        first = score_buddy_life_modern_cognition_receipt(receipt)
+        second = score_buddy_life_modern_cognition_receipt(receipt)
         self.assertEqual(first, second)
         self.assertEqual(receipt, before)
 

@@ -3,15 +3,15 @@ name: Norn stochastic score
 on:
   pull_request:
     paths:
-      - "scripts/norn_stochastic_score.py"
-      - "tests/test_norn_stochastic_score.py"
+      - "scripts/buddy_life_stochastic_score.py"
+      - "tests/test_buddy_life_stochastic_score.py"
       - "docs/NORN_STOCHASTIC_SCORE.md"
       - ".github/workflows/norn-stochastic-score.yml"
   push:
     branches: [master]
     paths:
-      - "scripts/norn_stochastic_score.py"
-      - "tests/test_norn_stochastic_score.py"
+      - "scripts/buddy_life_stochastic_score.py"
+      - "tests/test_buddy_life_stochastic_score.py"
       - "docs/NORN_STOCHASTIC_SCORE.md"
       - ".github/workflows/norn-stochastic-score.yml"
   workflow_dispatch:
@@ -29,6 +29,6 @@ jobs:
         with:
           python-version: "3.12"
       - name: Compile scorer
-        run: python -m py_compile scripts/norn_stochastic_score.py
+        run: python -m py_compile scripts/buddy_life_stochastic_score.py
       - name: Test aggregate thresholds and adversarial rejection
-        run: python -m unittest -v tests/test_norn_stochastic_score.py
+        run: python -m unittest -v tests/test_buddy_life_stochastic_score.py
