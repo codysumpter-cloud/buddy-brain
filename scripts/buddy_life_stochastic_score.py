@@ -10,7 +10,13 @@ import json
 from pathlib import Path
 from typing import Any, Callable
 
-RECEIPT_SCHEMA = "prismtek-norn-stochastic-arena-v1"
+# The runtime retired the legacy token from its own vocabulary, but a receipt that has
+# already been published cannot be re-emitted -- and a score is only meaningful if the
+# scorer can still read the evidence it was asked to judge. Both spellings are accepted;
+# the receipt names itself, and this file does not care which name it chose.
+RECEIPT_SCHEMA = "prismtek-buddy_life-stochastic-arena-v1"
+LEGACY_RECEIPT_SCHEMA = "prismtek-norn-stochastic-arena-v1"
+ACCEPTED_RECEIPT_SCHEMAS = (RECEIPT_SCHEMA, LEGACY_RECEIPT_SCHEMA)
 SCORE_SCHEMA = "prismtek-norn-stochastic-score-v1"
 EXPECTED_SEED = 90210
 EXPECTED_TRIALS = 32
@@ -24,7 +30,7 @@ REQUIRED_SCENARIOS = {
 }
 
 
-class NornStochasticScoreError(ValueError):
+class BuddyLifeStochasticScoreError(ValueError):
     """The stochastic receipt is malformed, tampered with, or insufficient."""
 
 
@@ -42,24 +48,24 @@ def _without_hash(value: dict[str, Any]) -> dict[str, Any]:
 def _verify_hash(payload: dict[str, Any], label: str) -> None:
     supplied = str(payload.get("receipt_sha256", ""))
     if not supplied:
-        raise NornStochasticScoreError(f"{label} is missing receipt_sha256")
+        raise BuddyLifeStochasticScoreError(f"{label} is missing receipt_sha256")
     if supplied != _digest(_without_hash(payload)):
-        raise NornStochasticScoreError(f"{label} hash mismatch")
+        raise BuddyLifeStochasticScoreError(f"{label} hash mismatch")
 
 
 def _number(value: Any, field: str) -> float:
     if isinstance(value, bool):
-        raise NornStochasticScoreError(f"{field} must be numeric")
+        raise BuddyLifeStochasticScoreError(f"{field} must be numeric")
     try:
         return float(value)
     except (TypeError, ValueError) as error:
-        raise NornStochasticScoreError(f"{field} must be numeric") from error
+        raise BuddyLifeStochasticScoreError(f"{field} must be numeric") from error
 
 
 def _measurement(scenario: dict[str, Any], name: str) -> Any:
     measurements = scenario.get("measurements")
     if not isinstance(measurements, dict) or name not in measurements:
-        raise NornStochasticScoreError(
+        raise BuddyLifeStochasticScoreError(
             f"scenario {scenario.get('id')} is missing measurement {name}"
         )
     return measurements[name]
@@ -68,24 +74,24 @@ def _measurement(scenario: dict[str, Any], name: str) -> Any:
 def _scenario_map(receipt: dict[str, Any]) -> dict[str, dict[str, Any]]:
     raw = receipt.get("scenarios")
     if not isinstance(raw, list):
-        raise NornStochasticScoreError("receipt.scenarios must be an array")
+        raise BuddyLifeStochasticScoreError("receipt.scenarios must be an array")
     result: dict[str, dict[str, Any]] = {}
     for index, scenario in enumerate(raw):
         if not isinstance(scenario, dict):
-            raise NornStochasticScoreError(f"scenario[{index}] must be an object")
+            raise BuddyLifeStochasticScoreError(f"scenario[{index}] must be an object")
         scenario_id = str(scenario.get("id", ""))
         if not scenario_id:
-            raise NornStochasticScoreError(f"scenario[{index}] requires id")
+            raise BuddyLifeStochasticScoreError(f"scenario[{index}] requires id")
         if scenario_id in result:
-            raise NornStochasticScoreError(f"duplicate scenario {scenario_id}")
+            raise BuddyLifeStochasticScoreError(f"duplicate scenario {scenario_id}")
         _verify_hash(scenario, f"scenario {scenario_id}")
         result[scenario_id] = scenario
     missing = sorted(set(REQUIRED_SCENARIOS) - set(result))
     extra = sorted(set(result) - set(REQUIRED_SCENARIOS))
     if missing:
-        raise NornStochasticScoreError(f"missing required scenarios: {', '.join(missing)}")
+        raise BuddyLifeStochasticScoreError(f"missing required scenarios: {', '.join(missing)}")
     if extra:
-        raise NornStochasticScoreError(f"unknown scenarios: {', '.join(extra)}")
+        raise BuddyLifeStochasticScoreError(f"unknown scenarios: {', '.join(extra)}")
     return result
 
 
@@ -258,13 +264,13 @@ JUDGES: dict[str, Judge] = {
 }
 
 
-def score_norn_stochastic_receipt(receipt: dict[str, Any]) -> dict[str, Any]:
-    if receipt.get("schema") != RECEIPT_SCHEMA:
-        raise NornStochasticScoreError("unsupported stochastic Norn receipt schema")
+def score_buddy_life_stochastic_receipt(receipt: dict[str, Any]) -> dict[str, Any]:
+    if receipt.get("schema") not in ACCEPTED_RECEIPT_SCHEMAS:
+        raise BuddyLifeStochasticScoreError("unsupported stochastic Norn receipt schema")
     if receipt.get("mode") != "cortex-off":
-        raise NornStochasticScoreError("stochastic Norn scoring requires cortex-off mode")
+        raise BuddyLifeStochasticScoreError("stochastic Norn scoring requires cortex-off mode")
     if receipt.get("seed") != EXPECTED_SEED or receipt.get("trials") != EXPECTED_TRIALS:
-        raise NornStochasticScoreError("unexpected stochastic seed or trial count")
+        raise BuddyLifeStochasticScoreError("unexpected stochastic seed or trial count")
     _verify_hash(receipt, "stochastic Norn receipt")
     scenarios = _scenario_map(receipt)
 
@@ -295,7 +301,7 @@ def score_norn_stochastic_receipt(receipt: dict[str, Any]) -> dict[str, Any]:
     passed = all(item["passed"] for item in judgments) and summary_consistent and awarded == 100
     score: dict[str, Any] = {
         "schema": SCORE_SCHEMA,
-        "source_schema": RECEIPT_SCHEMA,
+        "source_schema": str(receipt.get("schema", RECEIPT_SCHEMA)),
         "source_receipt_sha256": str(receipt["receipt_sha256"]),
         "mode": "cortex-off",
         "seed": EXPECTED_SEED,
@@ -325,9 +331,9 @@ def main() -> int:
     try:
         parsed = json.loads(args.receipt.read_text(encoding="utf-8"))
         if not isinstance(parsed, dict):
-            raise NornStochasticScoreError("receipt must be a JSON object")
-        score = score_norn_stochastic_receipt(parsed)
-    except (NornStochasticScoreError, json.JSONDecodeError, OSError) as error:
+            raise BuddyLifeStochasticScoreError("receipt must be a JSON object")
+        score = score_buddy_life_stochastic_receipt(parsed)
+    except (BuddyLifeStochasticScoreError, json.JSONDecodeError, OSError) as error:
         parser.error(str(error))
     rendered = json.dumps(score, indent=2, sort_keys=True) + "\n"
     if args.out is not None:

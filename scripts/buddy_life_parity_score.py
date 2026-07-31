@@ -10,7 +10,13 @@ import json
 from pathlib import Path
 from typing import Any, Callable
 
-RECEIPT_SCHEMA = "prismtek-norn-parity-arena-v1"
+# The runtime retired the legacy token from its own vocabulary, but a receipt that has
+# already been published cannot be re-emitted -- and a score is only meaningful if the
+# scorer can still read the evidence it was asked to judge. Both spellings are accepted;
+# the receipt names itself, and this file does not care which name it chose.
+RECEIPT_SCHEMA = "prismtek-buddy_life-parity-arena-v1"
+LEGACY_RECEIPT_SCHEMA = "prismtek-norn-parity-arena-v1"
+ACCEPTED_RECEIPT_SCHEMAS = (RECEIPT_SCHEMA, LEGACY_RECEIPT_SCHEMA)
 SCORE_SCHEMA = "prismtek-norn-parity-score-v1"
 REQUIRED_SCENARIOS = {
     "object-learning-reversal": 20,
@@ -23,7 +29,7 @@ REQUIRED_SCENARIOS = {
 }
 
 
-class NornParityScoreError(ValueError):
+class BuddyLifeParityScoreError(ValueError):
     """The game receipt is malformed, tampered with, or incomplete."""
 
 
@@ -41,25 +47,25 @@ def _without_hash(value: dict[str, Any]) -> dict[str, Any]:
 def _verify_hash(payload: dict[str, Any], label: str) -> None:
     supplied = str(payload.get("receipt_sha256", ""))
     if not supplied:
-        raise NornParityScoreError(f"{label} is missing receipt_sha256")
+        raise BuddyLifeParityScoreError(f"{label} is missing receipt_sha256")
     expected = _digest(_without_hash(payload))
     if supplied != expected:
-        raise NornParityScoreError(f"{label} hash mismatch")
+        raise BuddyLifeParityScoreError(f"{label} hash mismatch")
 
 
 def _number(value: Any, field: str) -> float:
     if isinstance(value, bool):
-        raise NornParityScoreError(f"{field} must be numeric")
+        raise BuddyLifeParityScoreError(f"{field} must be numeric")
     try:
         return float(value)
     except (TypeError, ValueError) as error:
-        raise NornParityScoreError(f"{field} must be numeric") from error
+        raise BuddyLifeParityScoreError(f"{field} must be numeric") from error
 
 
 def _measurement(scenario: dict[str, Any], name: str) -> Any:
     measurements = scenario.get("measurements")
     if not isinstance(measurements, dict) or name not in measurements:
-        raise NornParityScoreError(
+        raise BuddyLifeParityScoreError(
             f"scenario {scenario.get('id')} is missing measurement {name}"
         )
     return measurements[name]
@@ -68,24 +74,24 @@ def _measurement(scenario: dict[str, Any], name: str) -> Any:
 def _scenario_map(receipt: dict[str, Any]) -> dict[str, dict[str, Any]]:
     raw = receipt.get("scenarios")
     if not isinstance(raw, list):
-        raise NornParityScoreError("receipt.scenarios must be an array")
+        raise BuddyLifeParityScoreError("receipt.scenarios must be an array")
     result: dict[str, dict[str, Any]] = {}
     for index, scenario in enumerate(raw):
         if not isinstance(scenario, dict):
-            raise NornParityScoreError(f"scenario[{index}] must be an object")
+            raise BuddyLifeParityScoreError(f"scenario[{index}] must be an object")
         scenario_id = str(scenario.get("id", ""))
         if not scenario_id:
-            raise NornParityScoreError(f"scenario[{index}] requires id")
+            raise BuddyLifeParityScoreError(f"scenario[{index}] requires id")
         if scenario_id in result:
-            raise NornParityScoreError(f"duplicate scenario {scenario_id}")
+            raise BuddyLifeParityScoreError(f"duplicate scenario {scenario_id}")
         _verify_hash(scenario, f"scenario {scenario_id}")
         result[scenario_id] = scenario
     missing = sorted(set(REQUIRED_SCENARIOS) - set(result))
     extra = sorted(set(result) - set(REQUIRED_SCENARIOS))
     if missing:
-        raise NornParityScoreError(f"missing required scenarios: {', '.join(missing)}")
+        raise BuddyLifeParityScoreError(f"missing required scenarios: {', '.join(missing)}")
     if extra:
-        raise NornParityScoreError(f"unknown scenarios: {', '.join(extra)}")
+        raise BuddyLifeParityScoreError(f"unknown scenarios: {', '.join(extra)}")
     return result
 
 
@@ -130,13 +136,13 @@ def _judge_transfer(scenario: dict[str, Any]) -> tuple[bool, dict[str, Any]]:
 def _judge_planning(scenario: dict[str, Any]) -> tuple[bool, dict[str, Any]]:
     raw_ids = _measurement(scenario, "plan_ids")
     if not isinstance(raw_ids, list):
-        raise NornParityScoreError("plan_ids must be an array")
+        raise BuddyLifeParityScoreError("plan_ids must be an array")
     ids = [str(value) for value in raw_ids]
     steps = int(_number(_measurement(scenario, "steps"), "steps"))
     host_validated = bool(_measurement(scenario, "all_steps_require_host_validation"))
     final_drives = _measurement(scenario, "projected_final_drives")
     if not isinstance(final_drives, dict):
-        raise NornParityScoreError("projected_final_drives must be an object")
+        raise BuddyLifeParityScoreError("projected_final_drives must be an object")
     hunger = _number(final_drives.get("hunger"), "projected_final_drives.hunger")
     sleepiness = _number(final_drives.get("sleepiness"), "projected_final_drives.sleepiness")
     boredom = _number(final_drives.get("boredom"), "projected_final_drives.boredom")
@@ -240,12 +246,12 @@ JUDGES: dict[str, Judge] = {
 }
 
 
-def score_norn_parity_receipt(receipt: dict[str, Any]) -> dict[str, Any]:
+def score_buddy_life_parity_receipt(receipt: dict[str, Any]) -> dict[str, Any]:
     """Recompute hashes and independently judge every behavioral measurement."""
-    if receipt.get("schema") != RECEIPT_SCHEMA:
-        raise NornParityScoreError("unsupported Norn parity receipt schema")
+    if receipt.get("schema") not in ACCEPTED_RECEIPT_SCHEMAS:
+        raise BuddyLifeParityScoreError("unsupported Norn parity receipt schema")
     if receipt.get("mode") != "cortex-off":
-        raise NornParityScoreError("Norn parity requires a cortex-off receipt")
+        raise BuddyLifeParityScoreError("Norn parity requires a cortex-off receipt")
     _verify_hash(receipt, "Norn parity receipt")
     scenarios = _scenario_map(receipt)
 
@@ -277,7 +283,7 @@ def score_norn_parity_receipt(receipt: dict[str, Any]) -> dict[str, Any]:
     passed = independently_passed and runtime_summary_consistent and awarded == 100
     score: dict[str, Any] = {
         "schema": SCORE_SCHEMA,
-        "source_schema": RECEIPT_SCHEMA,
+        "source_schema": str(receipt.get("schema", RECEIPT_SCHEMA)),
         "source_receipt_sha256": str(receipt["receipt_sha256"]),
         "mode": "cortex-off",
         "score": awarded,
@@ -307,9 +313,9 @@ def main() -> int:
     try:
         parsed = json.loads(args.receipt.read_text(encoding="utf-8"))
         if not isinstance(parsed, dict):
-            raise NornParityScoreError("receipt must be a JSON object")
-        score = score_norn_parity_receipt(parsed)
-    except (NornParityScoreError, json.JSONDecodeError, OSError) as error:
+            raise BuddyLifeParityScoreError("receipt must be a JSON object")
+        score = score_buddy_life_parity_receipt(parsed)
+    except (BuddyLifeParityScoreError, json.JSONDecodeError, OSError) as error:
         parser.error(str(error))
     rendered = json.dumps(score, indent=2, sort_keys=True) + "\n"
     if args.out is not None:

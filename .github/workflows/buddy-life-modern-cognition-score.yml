@@ -3,15 +3,15 @@ name: Norn modern cognition score
 on:
   pull_request:
     paths:
-      - "scripts/norn_modern_cognition_score.py"
-      - "tests/test_norn_modern_cognition_score.py"
+      - "scripts/buddy_life_modern_cognition_score.py"
+      - "tests/test_buddy_life_modern_cognition_score.py"
       - "docs/NORN_MODERN_COGNITION_SCORE.md"
       - ".github/workflows/norn-modern-cognition-score.yml"
   push:
     branches: [master]
     paths:
-      - "scripts/norn_modern_cognition_score.py"
-      - "tests/test_norn_modern_cognition_score.py"
+      - "scripts/buddy_life_modern_cognition_score.py"
+      - "tests/test_buddy_life_modern_cognition_score.py"
       - "docs/NORN_MODERN_COGNITION_SCORE.md"
       - ".github/workflows/norn-modern-cognition-score.yml"
   workflow_dispatch:
@@ -29,6 +29,6 @@ jobs:
         with:
           python-version: "3.12"
       - name: Compile scorer
-        run: python -m py_compile scripts/norn_modern_cognition_score.py
+        run: python -m py_compile scripts/buddy_life_modern_cognition_score.py
       - name: Test independent thresholds and adversarial rejection
-        run: python -m unittest -v tests/test_norn_modern_cognition_score.py
+        run: python -m unittest -v tests/test_buddy_life_modern_cognition_score.py

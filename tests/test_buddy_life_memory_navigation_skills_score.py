@@ -10,15 +10,23 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from norn_memory_navigation_skills_score import (  # noqa: E402
-    NornMemoryNavigationSkillsScoreError,
-    score_norn_memory_navigation_skills_receipt,
+from buddy_life_memory_navigation_skills_score import (  # noqa: E402
+    LEGACY_RECEIPT_SCHEMA,
+    RECEIPT_SCHEMA,
+    BuddyLifeMemoryNavigationSkillsScoreError,
+    score_buddy_life_memory_navigation_skills_receipt,
 )
 
 
 def _digest(value: object) -> str:
     encoded = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+
+
+def _reseal(receipt: dict[str, object]) -> None:
+    """Re-stamp the receipt hash after editing it, the way the runtime stamps it."""
+    receipt.pop("receipt_sha256", None)
+    receipt["receipt_sha256"] = _digest(receipt)
 
 
 def _receipt() -> dict[str, object]:
@@ -87,9 +95,26 @@ def _rehash(receipt: dict[str, object]) -> None:
     )
 
 
-class NornMemoryNavigationSkillsScoreTests(unittest.TestCase):
+class BuddyLifeMemoryNavigationSkillsScoreTests(unittest.TestCase):
+    def test_current_and_legacy_receipt_schemas_both_score(self) -> None:
+        """A published receipt keeps its old name; a fresh one carries the new one."""
+        legacy = _receipt()
+        self.assertEqual(legacy["schema"], LEGACY_RECEIPT_SCHEMA)
+        legacy_score = score_buddy_life_memory_navigation_skills_receipt(legacy)
+
+        current = _receipt()
+        current["schema"] = RECEIPT_SCHEMA
+        _reseal(current)
+        current_score = score_buddy_life_memory_navigation_skills_receipt(current)
+
+        self.assertTrue(legacy_score["passed"])
+        self.assertTrue(current_score["passed"])
+        self.assertEqual(legacy_score["score"], current_score["score"])
+        self.assertEqual(legacy_score["source_schema"], LEGACY_RECEIPT_SCHEMA)
+        self.assertEqual(current_score["source_schema"], RECEIPT_SCHEMA)
+
     def test_exact_green_receipt_scores_one_hundred(self) -> None:
-        score = score_norn_memory_navigation_skills_receipt(_receipt())
+        score = score_buddy_life_memory_navigation_skills_receipt(_receipt())
         self.assertTrue(score["passed"])
         self.assertEqual(score["score"], 100)
         self.assertEqual(score["readiness"], "green")
@@ -103,7 +128,7 @@ class NornMemoryNavigationSkillsScoreTests(unittest.TestCase):
         assert isinstance(memory, dict)
         memory["selected_target"] = "berry"
         _rehash(receipt)
-        score = score_norn_memory_navigation_skills_receipt(receipt)
+        score = score_buddy_life_memory_navigation_skills_receipt(receipt)
         self.assertFalse(score["passed"])
         self.assertEqual(score["score"], 85)
 
@@ -116,7 +141,7 @@ class NornMemoryNavigationSkillsScoreTests(unittest.TestCase):
         semantic["object_after_weak_contradiction"] = False
         semantic["retained_confidence"] = 0.20
         _rehash(receipt)
-        score = score_norn_memory_navigation_skills_receipt(receipt)
+        score = score_buddy_life_memory_navigation_skills_receipt(receipt)
         judgment = next(item for item in score["judgments"] if item["id"] == "semantic_knowledge")
         self.assertFalse(score["passed"])
         self.assertFalse(judgment["passed"])
@@ -130,7 +155,7 @@ class NornMemoryNavigationSkillsScoreTests(unittest.TestCase):
         spatial["route_rooms"] = ["garden"]
         spatial["steps"] = 1
         _rehash(receipt)
-        score = score_norn_memory_navigation_skills_receipt(receipt)
+        score = score_buddy_life_memory_navigation_skills_receipt(receipt)
         judgment = next(item for item in score["judgments"] if item["id"] == "spatial_routing")
         self.assertFalse(score["passed"])
         self.assertFalse(judgment["passed"])
@@ -144,7 +169,7 @@ class NornMemoryNavigationSkillsScoreTests(unittest.TestCase):
         skill["learned"] = False
         skill["host_validated"] = False
         _rehash(receipt)
-        score = score_norn_memory_navigation_skills_receipt(receipt)
+        score = score_buddy_life_memory_navigation_skills_receipt(receipt)
         judgment = next(item for item in score["judgments"] if item["id"] == "hierarchical_skill")
         self.assertFalse(score["passed"])
         self.assertFalse(judgment["passed"])
@@ -157,7 +182,7 @@ class NornMemoryNavigationSkillsScoreTests(unittest.TestCase):
         assert isinstance(adaptation, dict)
         adaptation["reliability_after"] = 0.8
         _rehash(receipt)
-        score = score_norn_memory_navigation_skills_receipt(receipt)
+        score = score_buddy_life_memory_navigation_skills_receipt(receipt)
         judgment = next(item for item in score["judgments"] if item["id"] == "skill_adaptation")
         self.assertFalse(score["passed"])
         self.assertFalse(judgment["passed"])
@@ -170,7 +195,7 @@ class NornMemoryNavigationSkillsScoreTests(unittest.TestCase):
         assert isinstance(persistence, dict)
         persistence["skills"] = 0
         _rehash(receipt)
-        score = score_norn_memory_navigation_skills_receipt(receipt)
+        score = score_buddy_life_memory_navigation_skills_receipt(receipt)
         judgment = next(item for item in score["judgments"] if item["id"] == "persistence")
         self.assertFalse(score["passed"])
         self.assertFalse(judgment["passed"])
@@ -180,7 +205,7 @@ class NornMemoryNavigationSkillsScoreTests(unittest.TestCase):
         receipt["passed_count"] = 6
         receipt["failed_count"] = 1
         _rehash(receipt)
-        score = score_norn_memory_navigation_skills_receipt(receipt)
+        score = score_buddy_life_memory_navigation_skills_receipt(receipt)
         self.assertEqual(score["score"], 100)
         self.assertFalse(score["runtime_summary_consistent"])
         self.assertFalse(score["passed"])
@@ -191,8 +216,8 @@ class NornMemoryNavigationSkillsScoreTests(unittest.TestCase):
         assert isinstance(measurements, dict)
         del measurements["spatial_routing"]
         _rehash(receipt)
-        with self.assertRaisesRegex(NornMemoryNavigationSkillsScoreError, "missing required"):
-            score_norn_memory_navigation_skills_receipt(receipt)
+        with self.assertRaisesRegex(BuddyLifeMemoryNavigationSkillsScoreError, "missing required"):
+            score_buddy_life_memory_navigation_skills_receipt(receipt)
 
     def test_payload_tampering_is_rejected(self) -> None:
         receipt = _receipt()
@@ -201,14 +226,14 @@ class NornMemoryNavigationSkillsScoreTests(unittest.TestCase):
         persistence = measurements["persistence"]
         assert isinstance(persistence, dict)
         persistence["restored"] = False
-        with self.assertRaisesRegex(NornMemoryNavigationSkillsScoreError, "hash mismatch"):
-            score_norn_memory_navigation_skills_receipt(receipt)
+        with self.assertRaisesRegex(BuddyLifeMemoryNavigationSkillsScoreError, "hash mismatch"):
+            score_buddy_life_memory_navigation_skills_receipt(receipt)
 
     def test_scoring_is_deterministic_and_non_mutating(self) -> None:
         receipt = _receipt()
         before = copy.deepcopy(receipt)
-        first = score_norn_memory_navigation_skills_receipt(receipt)
-        second = score_norn_memory_navigation_skills_receipt(receipt)
+        first = score_buddy_life_memory_navigation_skills_receipt(receipt)
+        second = score_buddy_life_memory_navigation_skills_receipt(receipt)
         self.assertEqual(first, second)
         self.assertEqual(receipt, before)
 

@@ -10,7 +10,13 @@ import json
 from pathlib import Path
 from typing import Any, Callable
 
-RECEIPT_SCHEMA = "prismtek-norn-modern-cognition-receipt-v1"
+# The runtime retired the legacy token from its own vocabulary, but a receipt that has
+# already been published cannot be re-emitted -- and a score is only meaningful if the
+# scorer can still read the evidence it was asked to judge. Both spellings are accepted;
+# the receipt names itself, and this file does not care which name it chose.
+RECEIPT_SCHEMA = "prismtek-buddy_life-modern-cognition-receipt-v1"
+LEGACY_RECEIPT_SCHEMA = "prismtek-norn-modern-cognition-receipt-v1"
+ACCEPTED_RECEIPT_SCHEMAS = (RECEIPT_SCHEMA, LEGACY_RECEIPT_SCHEMA)
 SCORE_SCHEMA = "prismtek-norn-modern-cognition-score-v1"
 REQUIRED_MEASUREMENTS = {
     "delayed_credit": 15,
@@ -23,7 +29,7 @@ REQUIRED_MEASUREMENTS = {
 }
 
 
-class NornModernCognitionScoreError(ValueError):
+class BuddyLifeModernCognitionScoreError(ValueError):
     """The cognition receipt is malformed, tampered with, or incomplete."""
 
 
@@ -41,37 +47,37 @@ def _without_hash(value: dict[str, Any]) -> dict[str, Any]:
 def _verify_hash(receipt: dict[str, Any]) -> None:
     supplied = str(receipt.get("receipt_sha256", ""))
     if not supplied:
-        raise NornModernCognitionScoreError("receipt is missing receipt_sha256")
+        raise BuddyLifeModernCognitionScoreError("receipt is missing receipt_sha256")
     if supplied != _digest(_without_hash(receipt)):
-        raise NornModernCognitionScoreError("receipt hash mismatch")
+        raise BuddyLifeModernCognitionScoreError("receipt hash mismatch")
 
 
 def _number(value: Any, field: str) -> float:
     if isinstance(value, bool):
-        raise NornModernCognitionScoreError(f"{field} must be numeric")
+        raise BuddyLifeModernCognitionScoreError(f"{field} must be numeric")
     try:
         return float(value)
     except (TypeError, ValueError) as error:
-        raise NornModernCognitionScoreError(f"{field} must be numeric") from error
+        raise BuddyLifeModernCognitionScoreError(f"{field} must be numeric") from error
 
 
 def _measurement_map(receipt: dict[str, Any]) -> dict[str, dict[str, Any]]:
     raw = receipt.get("measurements")
     if not isinstance(raw, dict):
-        raise NornModernCognitionScoreError("receipt.measurements must be an object")
+        raise BuddyLifeModernCognitionScoreError("receipt.measurements must be an object")
     result: dict[str, dict[str, Any]] = {}
     for key, value in raw.items():
         if not isinstance(value, dict):
-            raise NornModernCognitionScoreError(f"measurement {key} must be an object")
+            raise BuddyLifeModernCognitionScoreError(f"measurement {key} must be an object")
         result[str(key)] = value
     missing = sorted(set(REQUIRED_MEASUREMENTS) - set(result))
     extra = sorted(set(result) - set(REQUIRED_MEASUREMENTS))
     if missing:
-        raise NornModernCognitionScoreError(
+        raise BuddyLifeModernCognitionScoreError(
             f"missing required measurements: {', '.join(missing)}"
         )
     if extra:
-        raise NornModernCognitionScoreError(
+        raise BuddyLifeModernCognitionScoreError(
             f"unknown measurements: {', '.join(extra)}"
         )
     return result
@@ -146,7 +152,7 @@ def _judge_development(row: dict[str, Any]) -> tuple[bool, dict[str, Any]]:
 def _judge_planning(row: dict[str, Any]) -> tuple[bool, dict[str, Any]]:
     raw_ids = row.get("ids")
     if not isinstance(raw_ids, list):
-        raise NornModernCognitionScoreError("planning.ids must be an array")
+        raise BuddyLifeModernCognitionScoreError("planning.ids must be an array")
     ids = [str(value) for value in raw_ids]
     steps = int(_number(row.get("steps"), "planning.steps"))
     expanded = int(_number(row.get("expanded"), "planning.expanded"))
@@ -227,10 +233,10 @@ JUDGES: dict[str, Judge] = {
 }
 
 
-def score_norn_modern_cognition_receipt(receipt: dict[str, Any]) -> dict[str, Any]:
+def score_buddy_life_modern_cognition_receipt(receipt: dict[str, Any]) -> dict[str, Any]:
     """Recompute the hash and independently judge all modern cognition measurements."""
-    if receipt.get("schema") != RECEIPT_SCHEMA:
-        raise NornModernCognitionScoreError("unsupported modern cognition receipt schema")
+    if receipt.get("schema") not in ACCEPTED_RECEIPT_SCHEMAS:
+        raise BuddyLifeModernCognitionScoreError("unsupported modern cognition receipt schema")
     _verify_hash(receipt)
     measurements = _measurement_map(receipt)
 
@@ -259,7 +265,7 @@ def score_norn_modern_cognition_receipt(receipt: dict[str, Any]) -> dict[str, An
     passed = independently_passed and runtime_summary_consistent and awarded == 100
     score: dict[str, Any] = {
         "schema": SCORE_SCHEMA,
-        "source_schema": RECEIPT_SCHEMA,
+        "source_schema": str(receipt.get("schema", RECEIPT_SCHEMA)),
         "source_receipt_sha256": str(receipt["receipt_sha256"]),
         "score": awarded,
         "maximum_score": 100,
@@ -288,9 +294,9 @@ def main() -> int:
     try:
         parsed = json.loads(args.receipt.read_text(encoding="utf-8"))
         if not isinstance(parsed, dict):
-            raise NornModernCognitionScoreError("receipt root must be an object")
-        score = score_norn_modern_cognition_receipt(parsed)
-    except (OSError, json.JSONDecodeError, NornModernCognitionScoreError) as error:
+            raise BuddyLifeModernCognitionScoreError("receipt root must be an object")
+        score = score_buddy_life_modern_cognition_receipt(parsed)
+    except (OSError, json.JSONDecodeError, BuddyLifeModernCognitionScoreError) as error:
         print(f"modern cognition score failed: {error}")
         return 1
     encoded = json.dumps(score, indent=2, sort_keys=True) + "\n"

@@ -10,15 +10,23 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from norn_stochastic_score import (  # noqa: E402
-    NornStochasticScoreError,
-    score_norn_stochastic_receipt,
+from buddy_life_stochastic_score import (  # noqa: E402
+    LEGACY_RECEIPT_SCHEMA,
+    RECEIPT_SCHEMA,
+    BuddyLifeStochasticScoreError,
+    score_buddy_life_stochastic_receipt,
 )
 
 
 def _digest(value: object) -> str:
     encoded = json.dumps(value, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+
+
+def _reseal(receipt: dict[str, object]) -> None:
+    """Re-stamp the receipt hash after editing it, the way the runtime stamps it."""
+    receipt.pop("receipt_sha256", None)
+    receipt["receipt_sha256"] = _digest(receipt)
 
 
 def _scenario(scenario_id: str, measurements: dict[str, object]) -> dict[str, object]:
@@ -127,9 +135,26 @@ def _rehash(receipt: dict[str, object]) -> None:
     )
 
 
-class NornStochasticScoreTests(unittest.TestCase):
+class BuddyLifeStochasticScoreTests(unittest.TestCase):
+    def test_current_and_legacy_receipt_schemas_both_score(self) -> None:
+        """A published receipt keeps its old name; a fresh one carries the new one."""
+        legacy = _receipt()
+        self.assertEqual(legacy["schema"], LEGACY_RECEIPT_SCHEMA)
+        legacy_score = score_buddy_life_stochastic_receipt(legacy)
+
+        current = _receipt()
+        current["schema"] = RECEIPT_SCHEMA
+        _reseal(current)
+        current_score = score_buddy_life_stochastic_receipt(current)
+
+        self.assertTrue(legacy_score["passed"])
+        self.assertTrue(current_score["passed"])
+        self.assertEqual(legacy_score["score"], current_score["score"])
+        self.assertEqual(legacy_score["source_schema"], LEGACY_RECEIPT_SCHEMA)
+        self.assertEqual(current_score["source_schema"], RECEIPT_SCHEMA)
+
     def test_exact_green_receipt_scores_one_hundred(self) -> None:
-        score = score_norn_stochastic_receipt(_receipt())
+        score = score_buddy_life_stochastic_receipt(_receipt())
         self.assertTrue(score["passed"])
         self.assertEqual(score["score"], 100)
         self.assertEqual(score["readiness"], "green")
@@ -145,7 +170,7 @@ class NornStochasticScoreTests(unittest.TestCase):
         assert isinstance(measurements, dict)
         measurements["mean_category_value"] = 0.10
         _rehash(receipt)
-        score = score_norn_stochastic_receipt(receipt)
+        score = score_buddy_life_stochastic_receipt(receipt)
         self.assertFalse(score["passed"])
         self.assertEqual(score["score"], 80)
         judgment = next(
@@ -164,7 +189,7 @@ class NornStochasticScoreTests(unittest.TestCase):
         assert isinstance(measurements, dict)
         measurements["acquisition_successes"] = 20
         _rehash(receipt)
-        score = score_norn_stochastic_receipt(receipt)
+        score = score_buddy_life_stochastic_receipt(receipt)
         self.assertFalse(score["passed"])
         judgment = next(
             item for item in score["judgments"] if item["id"] == "noisy-adaptation"
@@ -181,27 +206,27 @@ class NornStochasticScoreTests(unittest.TestCase):
         assert isinstance(measurements, dict)
         measurements["ticks"] = 100
         _rehash(receipt)
-        score = score_norn_stochastic_receipt(receipt)
+        score = score_buddy_life_stochastic_receipt(receipt)
         self.assertFalse(score["passed"])
 
     def test_tampered_receipt_is_rejected(self) -> None:
         receipt = _receipt()
         receipt["seed"] = 7
-        with self.assertRaisesRegex(NornStochasticScoreError, "seed or trial count"):
-            score_norn_stochastic_receipt(receipt)
+        with self.assertRaisesRegex(BuddyLifeStochasticScoreError, "seed or trial count"):
+            score_buddy_life_stochastic_receipt(receipt)
 
     def test_cortex_on_receipt_is_rejected(self) -> None:
         receipt = _receipt()
         receipt["mode"] = "cortex-on"
         _rehash(receipt)
-        with self.assertRaisesRegex(NornStochasticScoreError, "cortex-off"):
-            score_norn_stochastic_receipt(receipt)
+        with self.assertRaisesRegex(BuddyLifeStochasticScoreError, "cortex-off"):
+            score_buddy_life_stochastic_receipt(receipt)
 
     def test_scoring_is_deterministic_and_non_mutating(self) -> None:
         receipt = _receipt()
         before = copy.deepcopy(receipt)
-        first = score_norn_stochastic_receipt(receipt)
-        second = score_norn_stochastic_receipt(receipt)
+        first = score_buddy_life_stochastic_receipt(receipt)
+        second = score_buddy_life_stochastic_receipt(receipt)
         self.assertEqual(first, second)
         self.assertEqual(receipt, before)
 
