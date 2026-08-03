@@ -24,27 +24,27 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Check out Buddy Brain exact head
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           path: brain
 
       - name: Check out merged BUAP commit
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: codysumpter-cloud/buddy-universal-agent-profile
           ref: ${{ env.BUAP_SHA }}
           path: buap
 
       - name: Check out merged Buddy Agent commit
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: codysumpter-cloud/buddy-agent
           ref: ${{ env.BUDDY_AGENT_SHA }}
           path: agent
 
       - name: Check out merged Knowledge Vault commit
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: codysumpter-cloud/knowledge-vault
           ref: ${{ env.KNOWLEDGE_VAULT_SHA }}
