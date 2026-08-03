@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://prismtek.dev/schemas/model-registry.schema.json",
+  "title": "Buddy model lifecycle registry",
+  "type": "object",
+  "required": ["schema", "default_status", "models"],
+  "properties": {
+    "schema": { "const": "buddy.model-registry.v1" },
+    "default_status": { "enum": ["discovered", "quarantined"] },
+    "models": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["provider", "model", "status"],
+        "properties": {
+          "provider": { "type": "string", "minLength": 1 },
+          "model": { "type": "string", "minLength": 1 },
+          "status": {
+            "enum": [
+              "discovered",
+              "quarantined",
+              "benchmarked",
+              "security_reviewed",
+              "supervised",
+              "approved",
+              "deprecated"
+            ]
+          },
+          "task_classes": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "uniqueItems": true
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": { "type": "string", "minLength": 1 },
+            "uniqueItems": true
+          },
+          "discovered_at": { "type": "string" },
+          "reviewed_by": { "type": "string" },
+          "notes": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
