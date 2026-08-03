@@ -4,10 +4,11 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 from collections import defaultdict
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -23,6 +24,61 @@ REQUIRED_FIELDS = {
     "verification_passed",
     "artifacts_accepted",
 }
+CONTEXT_STRATEGIES = {"truncate", "compact", "summarize", "unknown"}
+
+
+@dataclass(frozen=True)
+class HarnessIdentity:
+    harness: str = "unknown"
+    effort: str = "unknown"
+    buap_artifact_hash: str = "unknown"
+    runtime_adapter_version: str = "unknown"
+    memory_strategy: str = "unknown"
+    context_strategy: str = "unknown"
+    reasoning_retention: bool = False
+    tool_policy_version: str = "unknown"
+
+    @classmethod
+    def from_dict(cls, payload: Any) -> "HarnessIdentity":
+        if payload is None:
+            return cls()
+        if not isinstance(payload, dict):
+            raise ValueError("harness_identity must be an object")
+        context_strategy = str(payload.get("context_strategy", "unknown"))
+        if context_strategy not in CONTEXT_STRATEGIES:
+            allowed = ", ".join(sorted(CONTEXT_STRATEGIES))
+            raise ValueError(f"context_strategy must be one of: {allowed}")
+        return cls(
+            harness=str(payload.get("harness", "unknown")) or "unknown",
+            effort=str(payload.get("effort", "unknown")) or "unknown",
+            buap_artifact_hash=str(payload.get("buap_artifact_hash", "unknown")) or "unknown",
+            runtime_adapter_version=str(payload.get("runtime_adapter_version", "unknown")) or "unknown",
+            memory_strategy=str(payload.get("memory_strategy", "unknown")) or "unknown",
+            context_strategy=context_strategy,
+            reasoning_retention=bool(payload.get("reasoning_retention", False)),
+            tool_policy_version=str(payload.get("tool_policy_version", "unknown")) or "unknown",
+        )
+
+    @property
+    def complete(self) -> bool:
+        values = (
+            self.harness,
+            self.effort,
+            self.buap_artifact_hash,
+            self.runtime_adapter_version,
+            self.memory_strategy,
+            self.context_strategy,
+            self.tool_policy_version,
+        )
+        return all(value != "unknown" for value in values)
+
+    @property
+    def fingerprint(self) -> str:
+        encoded = json.dumps(asdict(self), sort_keys=True, separators=(",", ":")).encode("utf-8")
+        return hashlib.sha256(encoded).hexdigest()[:16]
+
+    def to_dict(self) -> dict[str, Any]:
+        return {**asdict(self), "complete": self.complete, "fingerprint": self.fingerprint}
 
 
 @dataclass(frozen=True)
@@ -41,6 +97,7 @@ class TaskRecord:
     repository: str = ""
     workflow: str = ""
     security_gate: str = "not-run"
+    harness_identity: HarnessIdentity = HarnessIdentity()
 
     @classmethod
     def from_dict(cls, payload: dict[str, Any]) -> "TaskRecord":
@@ -53,6 +110,9 @@ class TaskRecord:
         for field in ("model_cost", "tool_cost", "human_review_minutes"):
             if float(payload[field]) < 0:
                 raise ValueError(f"{field} cannot be negative")
+        elapsed_ms = int(payload["elapsed_ms"])
+        if elapsed_ms < 0:
+            raise ValueError("elapsed_ms cannot be negative")
         return cls(
             task_id=str(payload["task_id"]),
             provider=str(payload["provider"]),
@@ -60,7 +120,7 @@ class TaskRecord:
             attempts=attempts,
             model_cost=float(payload["model_cost"]),
             tool_cost=float(payload["tool_cost"]),
-            elapsed_ms=int(payload["elapsed_ms"]),
+            elapsed_ms=elapsed_ms,
             human_review_minutes=float(payload["human_review_minutes"]),
             verification_passed=bool(payload["verification_passed"]),
             artifacts_accepted=bool(payload["artifacts_accepted"]),
@@ -68,11 +128,17 @@ class TaskRecord:
             repository=str(payload.get("repository", "")),
             workflow=str(payload.get("workflow", "")),
             security_gate=str(payload.get("security_gate", "not-run")),
+            harness_identity=HarnessIdentity.from_dict(payload.get("harness_identity")),
         )
 
     @property
     def verified_completion(self) -> bool:
-        return self.verification_passed and self.artifacts_accepted and not self.rolled_back and self.security_gate != "block"
+        return (
+            self.verification_passed
+            and self.artifacts_accepted
+            and not self.rolled_back
+            and self.security_gate != "block"
+        )
 
 
 def read_records(path: Path) -> list[TaskRecord]:
@@ -100,6 +166,7 @@ def summarize(records: Iterable[TaskRecord], human_hour_rate: float = 0.0) -> di
     retry_tasks = sum(item.attempts > 1 for item in items)
     rollbacks = sum(item.rolled_back for item in items)
     security_blocks = sum(item.security_gate == "block" for item in items)
+    incomplete_harness_records = sum(not item.harness_identity.complete for item in items)
     return {
         "tasks": tasks,
         "attempts": attempts,
@@ -109,12 +176,17 @@ def summarize(records: Iterable[TaskRecord], human_hour_rate: float = 0.0) -> di
         "retry_rate": round(retry_tasks / tasks, 4) if tasks else 0.0,
         "rollback_rate": round(rollbacks / tasks, 4) if tasks else 0.0,
         "security_block_rate": round(security_blocks / tasks, 4) if tasks else 0.0,
+        "incomplete_harness_records": incomplete_harness_records,
         "direct_cost": round(direct_cost, 6),
         "human_review_minutes": round(review_minutes, 2),
         "human_review_cost": round(review_cost, 6),
         "total_cost": round(total_cost, 6),
         "cost_per_verified_completion": round(total_cost / completions, 6) if completions else None,
-        "expected_cost_to_verified_completion": round((total_cost / tasks) / completion_rate, 6) if tasks and completion_rate else None,
+        "expected_cost_to_verified_completion": (
+            round((total_cost / tasks) / completion_rate, 6)
+            if tasks and completion_rate
+            else None
+        ),
         "median_elapsed_ms": _median([item.elapsed_ms for item in items]),
         "median_review_minutes": _median([item.human_review_minutes for item in items]),
     }
@@ -130,20 +202,21 @@ def _median(values: list[float | int]) -> float | None:
 
 
 def grouped_summary(records: list[TaskRecord], human_hour_rate: float = 0.0) -> dict[str, Any]:
-    groups: dict[tuple[str, str], list[TaskRecord]] = defaultdict(list)
+    groups: dict[tuple[str, str, str], list[TaskRecord]] = defaultdict(list)
     for record in records:
-        groups[(record.provider, record.model)].append(record)
+        groups[(record.provider, record.model, record.harness_identity.fingerprint)].append(record)
     return {
-        "version": 1,
+        "version": 2,
         "human_hour_rate": human_hour_rate,
         "overall": summarize(records, human_hour_rate),
-        "providers": [
+        "harnesses": [
             {
                 "provider": provider,
                 "model": model,
+                "harness_identity": items[0].harness_identity.to_dict(),
                 **summarize(items, human_hour_rate),
             }
-            for (provider, model), items in sorted(groups.items())
+            for (provider, model, _fingerprint), items in sorted(groups.items())
         ],
     }
 
@@ -158,19 +231,22 @@ def render_markdown(summary: dict[str, Any]) -> str:
         f"- Retry rate: {overall['retry_rate'] * 100:.1f}%",
         f"- Median human review: {overall['median_review_minutes'] or 0:g} minutes",
         f"- Rollback rate: {overall['rollback_rate'] * 100:.1f}%",
+        f"- Records missing complete harness identity: {overall['incomplete_harness_records']}",
         "",
-        "| Provider | Model | Tasks | Verified | Cost / verified completion | Retry rate | Median review |",
-        "|---|---|---:|---:|---:|---:|---:|",
+        "| Provider | Model | Harness | Context | Tasks | Verified | Cost / verified completion | Retry rate |",
+        "|---|---|---|---|---:|---:|---:|---:|",
     ]
-    for item in summary["providers"]:
+    for item in summary["harnesses"]:
+        identity = item["harness_identity"]
         lines.append(
-            f"| {item['provider']} | {item['model']} | {item['tasks']} | "
-            f"{item['verified_completion_rate'] * 100:.1f}% | {_money(item['cost_per_verified_completion'])} | "
-            f"{item['retry_rate'] * 100:.1f}% | {item['median_review_minutes'] or 0:g} min |"
+            f"| {item['provider']} | {item['model']} | {identity['fingerprint']} "
+            f"({identity['harness']}) | {identity['context_strategy']} | {item['tasks']} | "
+            f"{item['verified_completion_rate'] * 100:.1f}% | "
+            f"{_money(item['cost_per_verified_completion'])} | {item['retry_rate'] * 100:.1f}% |"
         )
     lines.extend([
         "",
-        "Use this report as routing feedback only after each provider/model group has a meaningful sample. Do not route on token price alone.",
+        "Compare routing results only within complete, matching harness identities and meaningful samples. A model name alone is not an experimental control.",
     ])
     return "\n".join(lines) + "\n"
 
@@ -180,7 +256,9 @@ def _money(value: float | None) -> str:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Calculate cost to verified completion from Buddy task records.")
+    parser = argparse.ArgumentParser(
+        description="Calculate cost to verified completion from Buddy task records."
+    )
     parser.add_argument("records", type=Path, help="JSON array or JSONL task records")
     parser.add_argument("--human-hour-rate", type=float, default=0.0)
     parser.add_argument("--format", choices=("json", "markdown"), default="markdown")
@@ -189,7 +267,11 @@ def main() -> int:
     if args.human_hour_rate < 0:
         raise SystemExit("--human-hour-rate cannot be negative")
     result = grouped_summary(read_records(args.records), args.human_hour_rate)
-    rendered = json.dumps(result, indent=2) + "\n" if args.format == "json" else render_markdown(result)
+    rendered = (
+        json.dumps(result, indent=2) + "\n"
+        if args.format == "json"
+        else render_markdown(result)
+    )
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
         args.output.write_text(rendered, encoding="utf-8")

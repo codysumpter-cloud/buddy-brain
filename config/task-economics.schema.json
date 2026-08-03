@@ -10,6 +10,20 @@
     "workflow": { "type": "string" },
     "provider": { "type": "string", "minLength": 1 },
     "model": { "type": "string", "minLength": 1 },
+    "harness_identity": {
+      "type": "object",
+      "properties": {
+        "harness": { "type": "string", "minLength": 1 },
+        "effort": { "type": "string", "minLength": 1 },
+        "buap_artifact_hash": { "type": "string", "minLength": 1 },
+        "runtime_adapter_version": { "type": "string", "minLength": 1 },
+        "memory_strategy": { "type": "string", "minLength": 1 },
+        "context_strategy": { "enum": ["truncate", "compact", "summarize", "unknown"] },
+        "reasoning_retention": { "type": "boolean" },
+        "tool_policy_version": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
     "attempts": { "type": "integer", "minimum": 1 },
     "model_cost": { "type": "number", "minimum": 0 },
     "tool_cost": { "type": "number", "minimum": 0 },
