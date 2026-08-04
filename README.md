@@ -1,3 +1,18 @@
+> # ⚠️ This repository is archived and superseded
+>
+> **buddy-brain has been retired as part of the Prismtek consolidation into [codysumpter-cloud/prismtek-apps](https://github.com/codysumpter-cloud/prismtek-apps).**
+>
+> Canonical location: **tools/buddy-brain and packages/buddy-governance**
+>
+> Its full 861-commit history was imported into prismtek-apps with original authorship preserved.
+>
+> - Audit record: [`docs/migrations/buddy-brain.yaml`](https://github.com/codysumpter-cloud/prismtek-apps/blob/main/docs/migrations/buddy-brain.yaml)
+> - Consolidation tracker: [prismtek-apps#359](https://github.com/codysumpter-cloud/prismtek-apps/issues/359)
+> - prismtek-apps revision at archive time: `f47023186c67e649378734ee80a158a022dbb941`
+>
+> Kept read-only for history and provenance. **Do not open new work here.**
+> The tag `pre-archive-final` marks the exact final state of the default branch.
+
 <p align="center">
   <img src="assets/buddy-brain-mascot.svg" alt="Buddy Brain animated ASCII mascot" width="320">
 </p>
